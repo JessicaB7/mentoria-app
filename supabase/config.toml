@@ -1,0 +1,7 @@
+project_id = "mentoria-app"
+
+[functions.create-student]
+verify_jwt = true
+
+[functions.calendly-webhook]
+verify_jwt = false
