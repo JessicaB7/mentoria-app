@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
+import { isStaff } from '@/types/database'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { AppLayout } from '@/components/AppLayout'
 import { LoginPage } from '@/routes/auth/LoginPage'
@@ -30,7 +31,7 @@ function RootRedirect() {
   }
 
   if (!session || !profile) return <Navigate to="/login" replace />
-  return <Navigate to={profile.role === 'admin' ? '/admin' : '/aluno'} replace />
+  return <Navigate to={isStaff(profile.role) ? '/admin' : '/aluno'} replace />
 }
 
 function App() {
@@ -52,7 +53,7 @@ function App() {
               </Route>
             </Route>
 
-            <Route element={<ProtectedRoute role="admin" />}>
+            <Route element={<ProtectedRoute role="staff" />}>
               <Route element={<AppLayout variant="admin" />}>
                 <Route path="/admin" element={<AdminLessons />} />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
