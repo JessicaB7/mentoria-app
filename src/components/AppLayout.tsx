@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import { isStaff } from '@/types/database'
 
 const studentNav = [{ to: '/aluno', label: 'Aulas', icon: BookOpen, end: true }]
 
@@ -19,7 +20,7 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
   const navigate = useNavigate()
   const nav = variant === 'admin' ? adminNav : studentNav
   const initials = profile?.full_name?.slice(0, 2).toUpperCase() ?? '??'
-  const canPreview = profile?.role === 'admin'
+  const canPreview = isStaff(profile?.role)
 
   return (
     <div className="flex min-h-svh">
@@ -66,7 +67,7 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-fg">{profile?.full_name}</p>
             <p className="truncate text-xs text-fg-muted">
-              {profile?.role === 'admin' ? 'Administrador' : 'Aluno'}
+              {profile?.role === 'admin' ? 'Administrador' : profile?.role === 'mentor' ? 'Mentor' : 'Aluno'}
             </p>
           </div>
           <button

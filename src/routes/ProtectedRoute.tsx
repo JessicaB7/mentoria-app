@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
-import type { UserRole } from '@/types/database'
+import { isStaff, type UserRole } from '@/types/database'
 
-export function ProtectedRoute({ role }: { role?: UserRole }) {
+export function ProtectedRoute({ role }: { role?: Extract<UserRole, 'student'> | 'staff' }) {
   const { session, profile, loading } = useAuth()
 
   if (loading) {
@@ -18,11 +18,14 @@ export function ProtectedRoute({ role }: { role?: UserRole }) {
     return <Navigate to="/login" replace />
   }
 
-  // Admin pode sempre pré-visualizar a área de aluno; o inverso não é permitido.
-  const allowed = !role || profile.role === role || (role === 'student' && profile.role === 'admin')
+  // Staff (admin/mentor) can always preview the student area; the reverse is not allowed.
+  const allowed =
+    !role ||
+    (role === 'staff' && isStaff(profile.role)) ||
+    (role === 'student' && (profile.role === 'student' || isStaff(profile.role)))
 
   if (!allowed) {
-    return <Navigate to={profile.role === 'admin' ? '/admin' : '/aluno'} replace />
+    return <Navigate to={isStaff(profile.role) ? '/admin' : '/aluno'} replace />
   }
 
   return <Outlet />
