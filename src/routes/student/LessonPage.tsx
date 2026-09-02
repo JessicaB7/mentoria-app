@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Download, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Download, ExternalLink, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getSignedUrl } from '@/lib/storage'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import type { Lesson, Material } from '@/types/database'
+import type { Lesson, Material, SessionRecording } from '@/types/database'
 
 export function LessonPage() {
   const { lessonId } = useParams<{ lessonId: string }>()
@@ -18,17 +18,26 @@ export function LessonPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['lesson', lessonId, profile?.id],
     queryFn: async () => {
-      const [{ data: lesson, error: lessonError }, { data: materials, error: materialsError }, { data: progress }] =
-        await Promise.all([
-          supabase.from('lessons').select('*').eq('id', lessonId!).single(),
-          supabase.from('materials').select('*').eq('lesson_id', lessonId!),
-          supabase
-            .from('lesson_progress')
-            .select('*')
-            .eq('lesson_id', lessonId!)
-            .eq('student_id', profile!.id)
-            .maybeSingle(),
-        ])
+      const [
+        { data: lesson, error: lessonError },
+        { data: materials, error: materialsError },
+        { data: recordings },
+        { data: progress },
+      ] = await Promise.all([
+        supabase.from('lessons').select('*').eq('id', lessonId!).single(),
+        supabase.from('materials').select('*').eq('lesson_id', lessonId!),
+        supabase
+          .from('session_recordings')
+          .select('*')
+          .eq('lesson_id', lessonId!)
+          .order('position', { ascending: true }),
+        supabase
+          .from('lesson_progress')
+          .select('*')
+          .eq('lesson_id', lessonId!)
+          .eq('student_id', profile!.id)
+          .maybeSingle(),
+      ])
       if (lessonError) throw lessonError
       if (materialsError) throw materialsError
 
@@ -40,6 +49,7 @@ export function LessonPage() {
       return {
         lesson: lessonTyped,
         materials: (materials ?? []) as Material[],
+        recordings: (recordings ?? []) as SessionRecording[],
         completed: progress?.completed ?? false,
         videoUrl,
       }
@@ -77,7 +87,7 @@ export function LessonPage() {
     )
   }
 
-  const { lesson, materials, completed, videoUrl } = data
+  const { lesson, materials, recordings, completed, videoUrl } = data
 
   return (
     <div className="flex flex-col gap-4">
@@ -103,6 +113,24 @@ export function LessonPage() {
         <CheckCircle2 className="size-4" />
         {completed ? 'Concluída — marcar como não vista' : 'Marcar como concluída'}
       </Button>
+
+      {recordings.length > 0 && (
+        <div className="mt-2 flex flex-col gap-2">
+          <h2 className="text-sm font-semibold text-fg">Gravações das sessões</h2>
+          {recordings.map((recording) => (
+            <a
+              key={recording.id}
+              href={recording.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-fit items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-sm text-fg hover:bg-border/30"
+            >
+              <ExternalLink className="size-4" />
+              {recording.title}
+            </a>
+          ))}
+        </div>
+      )}
 
       {materials.length > 0 && (
         <div className="mt-2 flex flex-col gap-2">

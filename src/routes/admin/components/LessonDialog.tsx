@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Trash2, Upload } from 'lucide-react'
+import { Trash2, Upload, Link as LinkIcon } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { uploadFile, removeFile } from '@/lib/storage'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import type { Lesson, Material, ModuleCategory, Profile } from '@/types/database'
+import type { Lesson, Material, ModuleCategory, Profile, SessionRecording } from '@/types/database'
 
 interface LessonDialogProps {
   open: boolean
@@ -44,6 +44,8 @@ export function LessonDialog({
   const [studentId, setStudentId] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [uploadingVideo, setUploadingVideo] = React.useState(false)
+  const [recordingTitle, setRecordingTitle] = React.useState('')
+  const [recordingUrl, setRecordingUrl] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -82,6 +84,20 @@ export function LessonDialog({
       return data as Material[]
     },
     enabled: !!currentLessonId,
+  })
+
+  const { data: recordings, refetch: refetchRecordings } = useQuery({
+    queryKey: ['session-recordings', currentLessonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('session_recordings')
+        .select('*')
+        .eq('lesson_id', currentLessonId!)
+        .order('position', { ascending: true })
+      if (error) throw error
+      return data as SessionRecording[]
+    },
+    enabled: !!currentLessonId && category === 'ao_vivo',
   })
 
   async function handleSaveDetails() {
@@ -160,6 +176,29 @@ export function LessonDialog({
     refetchMaterials()
   }
 
+  async function handleRecordingAdd() {
+    if (!currentLessonId || !recordingTitle.trim() || !recordingUrl.trim()) return
+    const { error } = await supabase.from('session_recordings').insert({
+      lesson_id: currentLessonId,
+      title: recordingTitle.trim(),
+      url: recordingUrl.trim(),
+      position: recordings?.length ?? 0,
+    })
+    if (error) {
+      toast.error('Não foi possível adicionar a gravação.')
+      return
+    }
+    setRecordingTitle('')
+    setRecordingUrl('')
+    toast.success('Gravação adicionada.')
+    refetchRecordings()
+  }
+
+  async function handleRecordingDelete(recording: SessionRecording) {
+    await supabase.from('session_recordings').delete().eq('id', recording.id)
+    refetchRecordings()
+  }
+
   function handleClose(nextOpen: boolean) {
     if (!nextOpen) {
       queryClient.invalidateQueries({ queryKey: ['admin-modules'] })
@@ -181,6 +220,11 @@ export function LessonDialog({
             <TabsTrigger value="materiais" disabled={!currentLessonId}>
               Materiais
             </TabsTrigger>
+            {category === 'ao_vivo' && (
+              <TabsTrigger value="gravacoes" disabled={!currentLessonId}>
+                Gravações
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="detalhes">
@@ -282,6 +326,69 @@ export function LessonDialog({
               </div>
             </div>
           </TabsContent>
+
+          {category === 'ao_vivo' && (
+            <TabsContent value="gravacoes">
+              <div className="flex flex-col gap-3">
+                <p className="text-xs text-fg-muted">
+                  Adiciona uma secção por sessão (ex.: "Sessão 7 de outubro") com o link da gravação
+                  (Zoom, Google Drive, YouTube, etc.).
+                </p>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="recording-title">Título da sessão</Label>
+                  <Input
+                    id="recording-title"
+                    placeholder="Ex.: Sessão 7 de outubro"
+                    value={recordingTitle}
+                    onChange={(e) => setRecordingTitle(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="recording-url">Link da gravação</Label>
+                  <Input
+                    id="recording-url"
+                    placeholder="https://…"
+                    value={recordingUrl}
+                    onChange={(e) => setRecordingUrl(e.target.value)}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-fit"
+                  disabled={!recordingTitle.trim() || !recordingUrl.trim()}
+                  onClick={handleRecordingAdd}
+                >
+                  <LinkIcon className="size-4" />
+                  Adicionar gravação
+                </Button>
+                <div className="flex flex-col divide-y divide-border">
+                  {(recordings ?? []).map((recording) => (
+                    <div key={recording.id} className="flex items-center justify-between py-2">
+                      <a
+                        href={recording.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-fg hover:underline"
+                      >
+                        {recording.title}
+                      </a>
+                      <button
+                        onClick={() => handleRecordingDelete(recording)}
+                        className="text-fg-muted hover:text-danger"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  ))}
+                  {(recordings ?? []).length === 0 && (
+                    <p className="py-2 text-sm text-fg-muted">Sem gravações ainda.</p>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </DialogContent>
     </Dialog>

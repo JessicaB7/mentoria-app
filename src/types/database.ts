@@ -52,6 +52,15 @@ export type Material = {
   created_at: string
 }
 
+export type SessionRecording = {
+  id: string
+  lesson_id: string
+  title: string
+  url: string
+  position: number
+  created_at: string
+}
+
 export type LessonProgress = {
   id: string
   student_id: string
@@ -108,6 +117,7 @@ export type Database = {
       modules: Table<Module>
       lessons: Table<Lesson>
       materials: Table<Material>
+      session_recordings: Table<SessionRecording>
       lesson_progress: Table<LessonProgress>
       crm_contacts: Table<CrmContact>
       crm_tasks: Table<CrmTask>
