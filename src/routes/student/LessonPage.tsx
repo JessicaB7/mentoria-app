@@ -96,7 +96,11 @@ export function LessonPage() {
       </Link>
 
       <h1 className="text-xl font-semibold text-fg">{lesson.title}</h1>
-      {lesson.description && <p className="text-sm text-fg-muted">{lesson.description}</p>}
+      {lesson.description && (
+        <div className="whitespace-pre-wrap rounded-lg border border-border bg-surface p-4 text-sm leading-relaxed text-fg">
+          {lesson.description}
+        </div>
+      )}
 
       {videoUrl ? (
         <video controls className="w-full max-w-3xl rounded-lg border border-border bg-black" src={videoUrl} />
