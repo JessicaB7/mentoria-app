@@ -72,7 +72,7 @@ export function AdminModulePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Link to="/admin" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
+      <Link to="/admin/gravado" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Voltar aos módulos
       </Link>
 

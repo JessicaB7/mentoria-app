@@ -7,10 +7,15 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { AppLayout } from '@/components/AppLayout'
 import { LoginPage } from '@/routes/auth/LoginPage'
 import { ResetPasswordPage } from '@/routes/auth/ResetPasswordPage'
-import { StudentDashboard } from '@/routes/student/StudentDashboard'
+import { StudentLiveLessons } from '@/routes/student/StudentLiveLessons'
+import { StudentRecordedContent } from '@/routes/student/StudentRecordedContent'
+import { StudentIndividualLessons } from '@/routes/student/StudentIndividualLessons'
 import { StudentModulePage } from '@/routes/student/StudentModulePage'
 import { LessonPage } from '@/routes/student/LessonPage'
-import { AdminLessons } from '@/routes/admin/AdminLessons'
+import { AdminLiveLessons } from '@/routes/admin/AdminLiveLessons'
+import { AdminRecordedContent } from '@/routes/admin/AdminRecordedContent'
+import { AdminIndividualHub } from '@/routes/admin/AdminIndividualHub'
+import { AdminStudentIndividualPage } from '@/routes/admin/AdminStudentIndividualPage'
 import { AdminModulePage } from '@/routes/admin/AdminModulePage'
 import { AdminStudents } from '@/routes/admin/AdminStudents'
 import { AdminCrm } from '@/routes/admin/AdminCrm'
@@ -47,7 +52,10 @@ function App() {
 
             <Route element={<ProtectedRoute role="student" />}>
               <Route element={<AppLayout variant="student" />}>
-                <Route path="/aluno" element={<StudentDashboard />} />
+                <Route path="/aluno" element={<Navigate to="/aluno/gravado" replace />} />
+                <Route path="/aluno/ao-vivo" element={<StudentLiveLessons />} />
+                <Route path="/aluno/gravado" element={<StudentRecordedContent />} />
+                <Route path="/aluno/individual" element={<StudentIndividualLessons />} />
                 <Route path="/aluno/modulos/:moduleId" element={<StudentModulePage />} />
                 <Route path="/aluno/aulas/:lessonId" element={<LessonPage />} />
               </Route>
@@ -55,7 +63,11 @@ function App() {
 
             <Route element={<ProtectedRoute role="staff" />}>
               <Route element={<AppLayout variant="admin" />}>
-                <Route path="/admin" element={<AdminLessons />} />
+                <Route path="/admin" element={<Navigate to="/admin/gravado" replace />} />
+                <Route path="/admin/ao-vivo" element={<AdminLiveLessons />} />
+                <Route path="/admin/gravado" element={<AdminRecordedContent />} />
+                <Route path="/admin/individual" element={<AdminIndividualHub />} />
+                <Route path="/admin/individual/:studentId" element={<AdminStudentIndividualPage />} />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
                 <Route path="/admin/alunos" element={<AdminStudents />} />
                 <Route path="/admin/crm" element={<AdminCrm />} />

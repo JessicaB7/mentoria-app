@@ -45,7 +45,7 @@ export function StudentModulePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Link to="/aluno" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
+      <Link to="/aluno/gravado" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Voltar aos módulos
       </Link>
 

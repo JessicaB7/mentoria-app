@@ -70,7 +70,10 @@ export function LessonPage() {
       { onConflict: 'student_id,lesson_id' },
     )
     await queryClient.invalidateQueries({ queryKey: ['lesson', lessonId, profile.id] })
-    await queryClient.invalidateQueries({ queryKey: ['student-modules', profile.id] })
+    await queryClient.invalidateQueries({ queryKey: ['student-recorded-content', profile.id] })
+    await queryClient.invalidateQueries({ queryKey: ['student-module'] })
+    await queryClient.invalidateQueries({ queryKey: ['student-live-lessons', profile.id] })
+    await queryClient.invalidateQueries({ queryKey: ['student-individual-lessons', profile.id] })
     setMarking(false)
   }
 
@@ -88,10 +91,16 @@ export function LessonPage() {
   }
 
   const { lesson, materials, recordings, completed, videoUrl } = data
+  const backTo =
+    lesson.category === 'ao_vivo'
+      ? '/aluno/ao-vivo'
+      : lesson.category === 'individual'
+        ? '/aluno/individual'
+        : '/aluno/gravado'
 
   return (
     <div className="flex flex-col gap-4">
-      <Link to="/aluno" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
+      <Link to={backTo} className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Voltar às aulas
       </Link>
 

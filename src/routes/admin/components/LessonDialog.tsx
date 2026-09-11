@@ -25,6 +25,7 @@ interface LessonDialogProps {
   lesson: Lesson | null
   nextPosition: number
   onSaved: () => void
+  defaultStudentId?: string | null
 }
 
 export function LessonDialog({
@@ -35,6 +36,7 @@ export function LessonDialog({
   lesson,
   nextPosition,
   onSaved,
+  defaultStudentId,
 }: LessonDialogProps) {
   const queryClient = useQueryClient()
   const [currentLessonId, setCurrentLessonId] = React.useState<string | null>(lesson?.id ?? null)
@@ -57,9 +59,9 @@ export function LessonDialog({
       setDuration(lesson?.duration_minutes ? String(lesson.duration_minutes) : '')
       setPublished(lesson?.published ?? true)
       setVideoPath(lesson?.video_path ?? null)
-      setStudentId(lesson?.student_id ?? null)
+      setStudentId(lesson?.student_id ?? defaultStudentId ?? null)
     }
-  }, [open, lesson])
+  }, [open, lesson, defaultStudentId])
 
   const { data: students } = useQuery({
     queryKey: ['students-for-lesson'],
