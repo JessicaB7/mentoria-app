@@ -15,6 +15,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Spinner } from '@/components/ui/spinner'
 import type { Lesson, Material, ModuleCategory, Profile, SessionRecording } from '@/types/database'
 
+const NO_STUDENT = '__none__'
+
 interface LessonDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -102,10 +104,6 @@ export function LessonDialog({
 
   async function handleSaveDetails() {
     if (!title.trim()) return
-    if (category === 'individual' && !studentId) {
-      toast.error('Escolhe o aluno a quem esta aula fica atribuída.')
-      return
-    }
     setSaving(true)
     const payload = {
       title,
@@ -244,11 +242,15 @@ export function LessonDialog({
               {category === 'individual' && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="lesson-student">Aluno</Label>
-                  <Select value={studentId ?? undefined} onValueChange={setStudentId}>
+                  <Select
+                    value={studentId ?? NO_STUDENT}
+                    onValueChange={(v) => setStudentId(v === NO_STUDENT ? null : v)}
+                  >
                     <SelectTrigger id="lesson-student">
                       <SelectValue placeholder="Escolhe o aluno…" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value={NO_STUDENT}>Nenhum — visível para todos os alunos</SelectItem>
                       {(students ?? []).map((student) => (
                         <SelectItem key={student.id} value={student.id}>
                           {student.full_name} · {student.email}
@@ -256,6 +258,10 @@ export function LessonDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-fg-muted">
+                    Sem aluno escolhido, a aula fica visível a todos os alunos — usa isto para explicar,
+                    por exemplo, as regras de agendamento das sessões individuais.
+                  </p>
                 </div>
               )}
               <div className="flex flex-col gap-1.5">
@@ -290,10 +296,7 @@ export function LessonDialog({
               <Button variant="outline" onClick={() => handleClose(false)}>
                 Fechar
               </Button>
-              <Button
-                onClick={handleSaveDetails}
-                disabled={saving || !title.trim() || (category === 'individual' && !studentId)}
-              >
+              <Button onClick={handleSaveDetails} disabled={saving || !title.trim()}>
                 Guardar
               </Button>
             </DialogFooter>
