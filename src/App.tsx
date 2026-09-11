@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { AppLayout } from '@/components/AppLayout'
 import { LoginPage } from '@/routes/auth/LoginPage'
 import { ResetPasswordPage } from '@/routes/auth/ResetPasswordPage'
+import { StudentHome } from '@/routes/student/StudentHome'
 import { StudentLiveLessons } from '@/routes/student/StudentLiveLessons'
 import { StudentRecordedContent } from '@/routes/student/StudentRecordedContent'
 import { StudentIndividualLessons } from '@/routes/student/StudentIndividualLessons'
@@ -52,7 +53,8 @@ function App() {
 
             <Route element={<ProtectedRoute role="student" />}>
               <Route element={<AppLayout variant="student" />}>
-                <Route path="/aluno" element={<Navigate to="/aluno/gravado" replace />} />
+                <Route path="/aluno" element={<Navigate to="/aluno/inicio" replace />} />
+                <Route path="/aluno/inicio" element={<StudentHome />} />
                 <Route path="/aluno/ao-vivo" element={<StudentLiveLessons />} />
                 <Route path="/aluno/gravado" element={<StudentRecordedContent />} />
                 <Route path="/aluno/individual" element={<StudentIndividualLessons />} />
