@@ -46,6 +46,7 @@ export function LessonDialog({
   const [published, setPublished] = React.useState(true)
   const [videoPath, setVideoPath] = React.useState<string | null>(null)
   const [studentId, setStudentId] = React.useState<string | null>(null)
+  const [sessionDate, setSessionDate] = React.useState('')
   const [saving, setSaving] = React.useState(false)
   const [uploadingVideo, setUploadingVideo] = React.useState(false)
   const [recordingTitle, setRecordingTitle] = React.useState('')
@@ -60,6 +61,7 @@ export function LessonDialog({
       setPublished(lesson?.published ?? true)
       setVideoPath(lesson?.video_path ?? null)
       setStudentId(lesson?.student_id ?? defaultStudentId ?? null)
+      setSessionDate(lesson?.session_date ?? '')
     }
   }, [open, lesson, defaultStudentId])
 
@@ -114,6 +116,7 @@ export function LessonDialog({
       published,
       video_path: videoPath,
       student_id: category === 'individual' ? studentId : null,
+      session_date: category === 'individual' ? sessionDate || null : null,
     }
     const { data, error } = currentLessonId
       ? await supabase.from('lessons').update(payload).eq('id', currentLessonId).select().single()
@@ -237,10 +240,22 @@ export function LessonDialog({
                 <Label htmlFor="lesson-description">Descrição</Label>
                 <Textarea
                   id="lesson-description"
+                  className="min-h-40"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
+              {category === 'individual' && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="lesson-session-date">Data da sessão</Label>
+                  <Input
+                    id="lesson-session-date"
+                    type="date"
+                    value={sessionDate}
+                    onChange={(e) => setSessionDate(e.target.value)}
+                  />
+                </div>
+              )}
               {category === 'individual' && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="lesson-student">Aluno</Label>

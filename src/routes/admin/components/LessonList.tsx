@@ -29,6 +29,11 @@ export function LessonList({
           <div key={lesson.id} className="flex items-center justify-between gap-3 px-4 py-3">
             <div className="flex min-w-0 items-center gap-2">
               <span className="truncate text-sm text-fg">{lesson.title}</span>
+              {lesson.session_date && (
+                <Badge variant="outline">
+                  {new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}
+                </Badge>
+              )}
               {!lesson.published && <Badge variant="outline">Rascunho</Badge>}
               {showStudent && (
                 <Badge variant="outline">

@@ -105,6 +105,15 @@ export function LessonPage() {
       </Link>
 
       <h1 className="text-xl font-semibold text-fg">{lesson.title}</h1>
+      {lesson.session_date && (
+        <p className="text-sm text-fg-muted">
+          {new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </p>
+      )}
       {lesson.description && (
         <div className="whitespace-pre-wrap rounded-lg border border-border bg-surface p-4 text-sm leading-relaxed text-fg">
           {lesson.description}

@@ -43,6 +43,7 @@ export type Lesson = {
     description: string | null
     video_path: string | null
     duration_minutes: number | null
+    session_date: string | null
     position: number
     published: boolean
     created_at: string

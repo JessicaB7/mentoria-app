@@ -31,8 +31,13 @@ export function LessonList({
               <PlayCircle className="size-4 shrink-0 text-fg-muted" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-fg">{lesson.title}</p>
-                {lesson.duration_minutes && (
-                  <p className="text-xs text-fg-muted">{lesson.duration_minutes} min</p>
+                {(lesson.session_date || lesson.duration_minutes) && (
+                  <p className="text-xs text-fg-muted">
+                    {lesson.session_date &&
+                      new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}
+                    {lesson.session_date && lesson.duration_minutes && ' · '}
+                    {lesson.duration_minutes && `${lesson.duration_minutes} min`}
+                  </p>
                 )}
               </div>
             </Link>
