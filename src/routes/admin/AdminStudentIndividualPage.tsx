@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ArrowLeft, Plus } from 'lucide-react'
+import { ArrowLeft, Eye, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
@@ -86,10 +86,18 @@ export function AdminStudentIndividualPage() {
           <h1 className="text-xl font-semibold text-fg">{student.full_name}</h1>
           <p className="text-sm text-fg-muted">{student.email}</p>
         </div>
-        <Button size="sm" onClick={() => setLessonDialog({ open: true, lesson: null })}>
-          <Plus className="size-4" />
-          Nova aula
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link to={`/admin/individual/${studentId}/preview`}>
+              <Eye className="size-4" />
+              Ver como aluno
+            </Link>
+          </Button>
+          <Button size="sm" onClick={() => setLessonDialog({ open: true, lesson: null })}>
+            <Plus className="size-4" />
+            Nova aula
+          </Button>
+        </div>
       </div>
 
       <LessonList

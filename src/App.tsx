@@ -17,6 +17,8 @@ import { AdminLiveLessons } from '@/routes/admin/AdminLiveLessons'
 import { AdminRecordedContent } from '@/routes/admin/AdminRecordedContent'
 import { AdminIndividualHub } from '@/routes/admin/AdminIndividualHub'
 import { AdminStudentIndividualPage } from '@/routes/admin/AdminStudentIndividualPage'
+import { AdminPreviewIndividualLessons } from '@/routes/admin/AdminPreviewIndividualLessons'
+import { AdminPreviewLesson } from '@/routes/admin/AdminPreviewLesson'
 import { AdminModulePage } from '@/routes/admin/AdminModulePage'
 import { AdminStudents } from '@/routes/admin/AdminStudents'
 import { AdminCrm } from '@/routes/admin/AdminCrm'
@@ -70,6 +72,14 @@ function App() {
                 <Route path="/admin/gravado" element={<AdminRecordedContent />} />
                 <Route path="/admin/individual" element={<AdminIndividualHub />} />
                 <Route path="/admin/individual/:studentId" element={<AdminStudentIndividualPage />} />
+                <Route
+                  path="/admin/individual/:studentId/preview"
+                  element={<AdminPreviewIndividualLessons />}
+                />
+                <Route
+                  path="/admin/individual/:studentId/aulas/:lessonId"
+                  element={<AdminPreviewLesson />}
+                />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
                 <Route path="/admin/alunos" element={<AdminStudents />} />
                 <Route path="/admin/crm" element={<AdminCrm />} />

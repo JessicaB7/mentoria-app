@@ -7,10 +7,12 @@ export function LessonList({
   lessons,
   completedIds,
   emptyLabel,
+  linkBase = '/aluno/aulas',
 }: {
   lessons: Lesson[]
   completedIds: Set<string>
   emptyLabel?: string
+  linkBase?: string
 }) {
   return (
     <Card>
@@ -20,7 +22,7 @@ export function LessonList({
           return (
             <Link
               key={lesson.id}
-              to={`/aluno/aulas/${lesson.id}`}
+              to={`${linkBase}/${lesson.id}`}
               className="flex items-center gap-3 px-4 py-3 hover:bg-border/20"
             >
               {done ? (
