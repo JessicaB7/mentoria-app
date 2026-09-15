@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Download, ExternalLink, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getSignedUrl } from '@/lib/storage'
+import { renderRichText } from '@/lib/richText'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
@@ -116,7 +117,7 @@ export function LessonPage() {
       )}
       {lesson.description && (
         <div className="whitespace-pre-wrap rounded-lg border border-border bg-surface p-4 text-sm leading-relaxed text-fg">
-          {lesson.description}
+          {renderRichText(lesson.description)}
         </div>
       )}
 

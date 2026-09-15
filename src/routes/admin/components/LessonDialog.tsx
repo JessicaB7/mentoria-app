@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { RichTextarea } from '@/components/ui/rich-textarea'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
@@ -238,11 +238,11 @@ export function LessonDialog({
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="lesson-description">Descrição</Label>
-                <Textarea
+                <RichTextarea
                   id="lesson-description"
                   className="min-h-40"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={setDescription}
                 />
               </div>
               {category === 'individual' && (
