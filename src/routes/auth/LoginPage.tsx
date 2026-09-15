@@ -49,10 +49,19 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-background px-4">
+    <div
+      className="flex min-h-svh items-center justify-center bg-background px-4"
+      style={{
+        backgroundImage:
+          'radial-gradient(60% 50% at 85% 10%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent)',
+      }}
+    >
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Entrar na Mentoria Contabilistas</CardTitle>
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+            Mentoria Contabilistas
+          </p>
+          <CardTitle>Acesso exclusivo de alunos</CardTitle>
           <CardDescription>Acede às tuas aulas e materiais.</CardDescription>
         </CardHeader>
         <CardContent>

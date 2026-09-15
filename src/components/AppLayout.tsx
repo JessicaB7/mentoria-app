@@ -32,9 +32,12 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
   return (
     <div className="flex min-h-svh">
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
-        <div className="flex items-center gap-2 border-b border-border px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        <div className="flex items-center gap-2.5 border-b border-border px-4 py-4">
           <GraduationCap className="size-6 shrink-0 text-primary" />
-          <span className="text-sm font-semibold leading-tight text-fg">Mentoria Contabilistas</span>
+          <span className="text-sm font-semibold leading-tight tracking-wide text-fg">
+            Mentoria Contabilistas
+          </span>
         </div>
 
         {canPreview && (
