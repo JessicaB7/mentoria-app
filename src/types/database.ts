@@ -18,6 +18,7 @@ export type Profile = {
     role: UserRole
     avatar_url: string | null
     start_date: string | null
+    main_goal: string | null
     mentoria_value: number | null
     payment_method: PaymentMethod | null
     installments_count: number | null

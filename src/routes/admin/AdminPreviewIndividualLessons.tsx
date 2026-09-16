@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Spinner } from '@/components/ui/spinner'
+import { IndividualIntro } from '@/components/IndividualIntro'
 import { LessonList } from '@/routes/student/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
 
@@ -58,6 +59,8 @@ export function AdminPreviewIndividualLessons() {
         <h1 className="text-xl font-semibold text-fg">Acompanhamento individual</h1>
         <p className="text-sm text-fg-muted">A ver como {data.student.full_name} vê esta secção.</p>
       </div>
+
+      <IndividualIntro student={data.student} />
 
       <LessonList
         lessons={data.lessons}

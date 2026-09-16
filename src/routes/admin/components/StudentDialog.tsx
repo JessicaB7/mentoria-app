@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
@@ -157,6 +158,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [email, setEmail] = React.useState('')
   const [phone, setPhone] = React.useState('')
   const [startDate, setStartDate] = React.useState('')
+  const [mainGoal, setMainGoal] = React.useState('')
   const [mentoriaValue, setMentoriaValue] = React.useState('')
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | ''>('')
   const [installmentsCount, setInstallmentsCount] = React.useState('')
@@ -169,6 +171,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setEmail(student?.email ?? '')
       setPhone(student?.phone ?? '')
       setStartDate(student?.start_date ?? '')
+      setMainGoal(student?.main_goal ?? '')
       setMentoriaValue(student?.mentoria_value != null ? String(student.mentoria_value) : '')
       setPaymentMethod(student?.payment_method ?? '')
       setInstallmentsCount(student?.installments_count != null ? String(student.installments_count) : '')
@@ -184,6 +187,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       full_name: fullName,
       phone: phone || null,
       start_date: startDate || null,
+      main_goal: mainGoal.trim() || null,
       mentoria_value: mentoriaValue ? Number(mentoriaValue) : null,
       payment_method: paymentMethod || null,
       installments_count: paymentMethod === 'prestacoes' && installmentsCount ? Number(installmentsCount) : null,
@@ -254,6 +258,18 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
         />
+      </div>
+      <div className="col-span-2 flex flex-col gap-1.5">
+        <Label htmlFor="student-main-goal">Objetivo principal</Label>
+        <Textarea
+          id="student-main-goal"
+          placeholder="Ex.: Passar de 20 para 50 clientes recorrentes até final do ano."
+          value={mainGoal}
+          onChange={(e) => setMainGoal(e.target.value)}
+        />
+        <p className="text-xs text-fg-muted">
+          Aparece no início do Acompanhamento Individual do aluno.
+        </p>
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="student-value">Valor da mentoria (€)</Label>

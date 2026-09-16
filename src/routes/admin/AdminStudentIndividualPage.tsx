@@ -6,6 +6,7 @@ import { ArrowLeft, Eye, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
+import { IndividualIntro } from '@/components/IndividualIntro'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -99,6 +100,8 @@ export function AdminStudentIndividualPage() {
           </Button>
         </div>
       </div>
+
+      <IndividualIntro student={student} />
 
       <LessonList
         lessons={lessons}

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
+import { IndividualIntro } from '@/components/IndividualIntro'
 import { LessonList } from '@/routes/student/components/LessonList'
 import type { Lesson } from '@/types/database'
 
@@ -46,6 +47,7 @@ export function StudentIndividualLessons() {
           Regras gerais e as sessões 1:1 dedicadas a ti.
         </p>
       </div>
+      {profile && <IndividualIntro student={profile} />}
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
