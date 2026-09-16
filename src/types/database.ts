@@ -115,6 +115,12 @@ export type Payment = {
     created_at: string
 }
 
+export type AppSetting = {
+    key: string
+    value: string | null
+    updated_at: string
+}
+
 type Table<Row> = { Row: Row; Insert: Partial<Row>; Update: Partial<Row>; Relationships: [] }
 
 export type Database = {
@@ -129,6 +135,7 @@ export type Database = {
                   crm_contacts: Table<CrmContact>
                   crm_tasks: Table<CrmTask>
                   payments: Table<Payment>
+                  app_settings: Table<AppSetting>
           }
           Views: Record<string, never>
           Functions: Record<string, never>

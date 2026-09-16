@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
+import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -18,6 +19,7 @@ export function AdminStudentIndividualPage() {
     open: false,
     lesson: null,
   })
+  const [introDialogOpen, setIntroDialogOpen] = React.useState(false)
 
   const { data: student, isLoading: studentLoading } = useQuery({
     queryKey: ['student-profile', studentId],
@@ -101,7 +103,7 @@ export function AdminStudentIndividualPage() {
         </div>
       </div>
 
-      <IndividualIntro student={student} />
+      <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
       <LessonList
         lessons={lessons}
@@ -122,6 +124,8 @@ export function AdminStudentIndividualPage() {
         onSaved={refresh}
         defaultStudentId={studentId}
       />
+
+      <IndividualIntroDialog open={introDialogOpen} onOpenChange={setIntroDialogOpen} />
     </div>
   )
 }
