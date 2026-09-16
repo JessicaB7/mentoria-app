@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { PaymentDialog } from '@/routes/admin/components/PaymentDialog'
+import { PaymentPlan } from '@/routes/admin/components/PaymentPlan'
 import type { Payment, PaymentMethod, Profile } from '@/types/database'
 
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
@@ -140,6 +141,7 @@ export function AdminFinance() {
         <TabsList>
           <TabsTrigger value="em-falta">Em falta ({pendingStudents.length})</TabsTrigger>
           <TabsTrigger value="pago">Pago ({paidStudents.length})</TabsTrigger>
+          <TabsTrigger value="plano">Plano mensal</TabsTrigger>
         </TabsList>
 
         <TabsContent value="em-falta">
@@ -162,6 +164,10 @@ export function AdminFinance() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="plano">
+          <PaymentPlan students={students} payments={payments} />
         </TabsContent>
       </Tabs>
 
