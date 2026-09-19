@@ -9,6 +9,7 @@ type InstallmentStatus = 'pago' | 'atrasado' | 'a-vencer'
 
 interface InstallmentRow {
   student: Profile
+  kind: 'entrada' | 'prestacao'
   index: number
   total: number
   dueDate: Date
@@ -36,21 +37,45 @@ function buildSchedule(students: Profile[], receivedByStudent: Map<string, numbe
     if (student.payment_method !== 'prestacoes') continue
     if (!student.installments_count || !student.mentoria_value || !student.start_date) continue
 
-    const amount = student.mentoria_value / student.installments_count
     const received = receivedByStudent.get(student.id) ?? 0
     const startDate = new Date(`${student.start_date}T00:00:00`)
+    const downPayment = student.down_payment && student.down_payment > 0 ? student.down_payment : 0
+    const remaining = student.mentoria_value - downPayment
+    const installmentAmount = remaining / student.installments_count
+
+    function statusFor(dueDate: Date, expectedCumulative: number): InstallmentStatus {
+      if (received >= expectedCumulative - 0.01) return 'pago'
+      if (isBefore(dueDate, today)) return 'atrasado'
+      return 'a-vencer'
+    }
+
+    let cumulative = 0
+
+    if (downPayment > 0) {
+      cumulative += downPayment
+      rows.push({
+        student,
+        kind: 'entrada',
+        index: 0,
+        total: student.installments_count,
+        dueDate: startDate,
+        amount: downPayment,
+        status: statusFor(startDate, cumulative),
+      })
+    }
 
     for (let i = 1; i <= student.installments_count; i++) {
-      const dueDate = addMonths(startDate, i - 1)
-      const expectedCumulative = amount * i
-      const paid = received >= expectedCumulative - 0.01
-
-      let status: InstallmentStatus
-      if (paid) status = 'pago'
-      else if (isBefore(dueDate, today)) status = 'atrasado'
-      else status = 'a-vencer'
-
-      rows.push({ student, index: i, total: student.installments_count, dueDate, amount, status })
+      const dueDate = addMonths(startDate, downPayment > 0 ? i : i - 1)
+      cumulative += installmentAmount
+      rows.push({
+        student,
+        kind: 'prestacao',
+        index: i,
+        total: student.installments_count,
+        dueDate,
+        amount: installmentAmount,
+        status: statusFor(dueDate, cumulative),
+      })
     }
   }
 
@@ -132,13 +157,14 @@ export function PaymentPlan({ students, payments }: { students: Profile[]; payme
                 <div className="flex flex-col divide-y divide-border">
                   {rows.map((row) => (
                     <div
-                      key={`${row.student.id}-${row.index}`}
+                      key={`${row.student.id}-${row.kind}-${row.index}`}
                       className="flex items-center justify-between gap-3 px-4 py-2.5"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm text-fg">{row.student.full_name}</p>
                         <p className="text-xs text-fg-muted">
-                          Prestação {row.index}/{row.total} · {format(row.dueDate, 'dd/MM')}
+                          {row.kind === 'entrada' ? 'Entrada' : `Prestação ${row.index}/${row.total}`} ·{' '}
+                          {format(row.dueDate, 'dd/MM')}
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">

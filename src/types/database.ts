@@ -20,6 +20,7 @@ export type Profile = {
     start_date: string | null
     main_goal: string | null
     mentoria_value: number | null
+    down_payment: number | null
     payment_method: PaymentMethod | null
     installments_count: number | null
     created_at: string

@@ -161,6 +161,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [mainGoal, setMainGoal] = React.useState('')
   const [mentoriaValue, setMentoriaValue] = React.useState('')
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | ''>('')
+  const [downPayment, setDownPayment] = React.useState('')
   const [installmentsCount, setInstallmentsCount] = React.useState('')
   const [saving, setSaving] = React.useState(false)
   const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
@@ -174,6 +175,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setMainGoal(student?.main_goal ?? '')
       setMentoriaValue(student?.mentoria_value != null ? String(student.mentoria_value) : '')
       setPaymentMethod(student?.payment_method ?? '')
+      setDownPayment(student?.down_payment != null ? String(student.down_payment) : '')
       setInstallmentsCount(student?.installments_count != null ? String(student.installments_count) : '')
       setCredentials(null)
     }
@@ -190,6 +192,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       main_goal: mainGoal.trim() || null,
       mentoria_value: mentoriaValue ? Number(mentoriaValue) : null,
       payment_method: paymentMethod || null,
+      down_payment: paymentMethod === 'prestacoes' && downPayment ? Number(downPayment) : null,
       installments_count: paymentMethod === 'prestacoes' && installmentsCount ? Number(installmentsCount) : null,
     }
 
@@ -296,7 +299,23 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       </div>
       {paymentMethod === 'prestacoes' && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="student-installments">Número de prestações</Label>
+          <Label htmlFor="student-down-payment">Valor de entrada (€)</Label>
+          <Input
+            id="student-down-payment"
+            type="number"
+            min={0}
+            step="0.01"
+            placeholder="Opcional"
+            value={downPayment}
+            onChange={(e) => setDownPayment(e.target.value)}
+          />
+        </div>
+      )}
+      {paymentMethod === 'prestacoes' && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="student-installments">
+            {downPayment ? 'Número de prestações (após entrada)' : 'Número de prestações'}
+          </Label>
           <Input
             id="student-installments"
             type="number"

@@ -237,7 +237,7 @@ export function LessonDialog({
                 <Input id="lesson-title" value={title} onChange={(e) => setTitle(e.target.value)} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="lesson-description">Descrição</Label>
+                <Label htmlFor="lesson-description">{category === 'modulo' ? 'Notas' : 'Descrição'}</Label>
                 <RichTextarea
                   id="lesson-description"
                   className="min-h-40"
@@ -281,16 +281,18 @@ export function LessonDialog({
                   </p>
                 </div>
               )}
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="lesson-duration">Duração (minutos)</Label>
-                <Input
-                  id="lesson-duration"
-                  type="number"
-                  min={0}
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                />
-              </div>
+              {category !== 'modulo' && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="lesson-duration">Duração (minutos)</Label>
+                  <Input
+                    id="lesson-duration"
+                    type="number"
+                    min={0}
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                  />
+                </div>
+              )}
               <div className="flex flex-col gap-1.5">
                 <Label>Vídeo</Label>
                 <div className="flex items-center gap-2">
