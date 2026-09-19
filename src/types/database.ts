@@ -14,6 +14,12 @@ export type ModuleCategory = 'modulo' | 'individual' | 'ao_vivo'
 export type SessionType = 'boas_vindas' | 'convidado' | 'encerramento' | 'presencial'
 export type GoalStatus = 'por_comecar' | 'em_andamento' | 'concluido'
 export type DeliverableStatus = 'em_analise' | 'revisto'
+export type OnboardingStatus =
+  | 'convidado'
+  | 'contrato_enviado'
+  | 'entrada_paga'
+  | 'debito_ativo'
+  | 'ativo'
 
 export type Profile = {
     id: string
@@ -36,6 +42,7 @@ export type Profile = {
     business_area: string | null
     current_clients: string | null
     biggest_challenge: string | null
+    onboarding_status: OnboardingStatus
     created_at: string
 }
 
