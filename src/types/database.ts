@@ -8,7 +8,7 @@ export type CrmStage = 'lead' | 'contacted' | 'proposal' | 'won' | 'lost'
 export type CrmTaskStatus = 'pending' | 'done'
 
 export type PaymentMethod = 'pronto' | 'prestacoes'
-export type PaymentChannel = 'transferencia' | 'stripe' | 'debito_direto'
+export type PaymentChannel = 'transferencia' | 'gocardless'
 export type BusinessType = 'independente' | 'empresa' | 'ainda_nao_comecei'
 export type ModuleCategory = 'modulo' | 'individual' | 'ao_vivo'
 export type SessionType = 'boas_vindas' | 'convidado' | 'encerramento' | 'presencial'
@@ -42,6 +42,13 @@ export type Profile = {
     business_area: string | null
     current_clients: string | null
     biggest_challenge: string | null
+    current_services: string | null
+    challenges: string[] | null
+    other_challenges: string | null
+    enrollment_reason: string | null
+    success_definition: string | null
+    learning_goals: string | null
+    additional_notes: string | null
     onboarding_status: OnboardingStatus
     created_at: string
 }

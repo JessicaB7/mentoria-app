@@ -1,5 +1,7 @@
 import * as React from 'react'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { CalendarCheck2, CalendarDays, BookOpen, Radio, UserCog } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -7,6 +9,35 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+const QUICK_LINKS = [
+  {
+    to: '/aluno/ao-vivo',
+    icon: Radio,
+    label: 'Aula ao vivo',
+    description: 'Hot Seats e as próximas sessões em grupo.',
+  },
+  {
+    to: '/aluno/gravado',
+    icon: BookOpen,
+    label: 'Conteúdo gravado',
+    description: 'O currículo completo, ao teu ritmo.',
+  },
+  {
+    to: '/aluno/individual',
+    icon: UserCog,
+    label: 'Acompanhamento individual',
+    description: 'As tuas sessões 1:1 e o teu plano de ação.',
+  },
+]
+
+function formatDate(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}
 
 export function StudentHome() {
   const { profile, refreshProfile } = useAuth()
@@ -21,6 +52,7 @@ export function StudentHome() {
 
   const dirty = profile != null && (fullName !== profile.full_name || phone !== (profile.phone ?? ''))
   const initials = profile?.full_name?.slice(0, 2).toUpperCase() ?? '??'
+  const firstName = profile?.full_name?.split(' ')[0] ?? ''
 
   async function handleSave() {
     if (!profile || !fullName.trim()) return
@@ -40,14 +72,66 @@ export function StudentHome() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <Avatar className="size-12">
-          <AvatarFallback className="text-base">{initials}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-xl font-semibold text-fg">Olá, {profile?.full_name}</h1>
-          <p className="text-sm text-fg-muted">Bem-vindo(a) de volta à tua mentoria.</p>
+      <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-surface p-6">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              'radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 60%)',
+          }}
+        />
+        <div className="relative flex flex-col gap-5">
+          <div className="flex items-center gap-4">
+            <Avatar className="size-14 border border-primary/40">
+              <AvatarFallback className="text-lg">{initials}</AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="text-2xl font-semibold text-fg">Olá, {firstName} 👋</h1>
+              <p className="text-sm text-fg-muted">Bem-vindo(a) de volta à tua mentoria.</p>
+            </div>
+          </div>
+
+          {(profile?.start_date || profile?.end_date) && (
+            <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:gap-8">
+              {profile?.start_date && (
+                <div className="flex items-start gap-2">
+                  <CalendarDays className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                      Início da mentoria
+                    </p>
+                    <p className="text-sm text-fg">{formatDate(profile.start_date)}</p>
+                  </div>
+                </div>
+              )}
+              {profile?.end_date && (
+                <div className="flex items-start gap-2">
+                  <CalendarCheck2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                      Fim previsto
+                    </p>
+                    <p className="text-sm text-fg">{formatDate(profile.end_date)}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group flex flex-col gap-2 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-primary/50"
+          >
+            <Icon className="size-5 text-primary" />
+            <p className="text-sm font-medium text-fg">{label}</p>
+            <p className="text-xs text-fg-muted">{description}</p>
+          </Link>
+        ))}
       </div>
 
       <Card className="max-w-md">

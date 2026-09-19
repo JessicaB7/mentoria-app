@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
+import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
@@ -64,6 +65,8 @@ export function AdminPreviewIndividualLessons() {
       </div>
 
       <IndividualIntro student={data.student} />
+
+      <DiagnosticCard student={data.student} />
 
       <GoalList studentId={data.student.id} canManage={false} />
 

@@ -17,8 +17,7 @@ const PAYMENT_LABELS: Record<PaymentMethod, string> = {
 
 const PAYMENT_CHANNEL_LABELS: Record<PaymentChannel, string> = {
   transferencia: 'Transferência',
-  stripe: 'Stripe',
-  debito_direto: 'Débito direto',
+  gocardless: 'GoCardless',
 }
 
 export function AdminFinance() {

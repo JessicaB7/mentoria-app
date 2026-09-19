@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
+import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
@@ -106,6 +107,8 @@ export function AdminStudentIndividualPage() {
       </div>
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
+
+      <DiagnosticCard student={student} />
 
       <GoalList studentId={student.id} canManage />
 
