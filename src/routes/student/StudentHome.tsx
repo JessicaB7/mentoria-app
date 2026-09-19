@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useHomeWelcomeSettings } from '@/components/HomeWelcome'
 
 const QUICK_LINKS = [
   {
@@ -41,6 +42,7 @@ function formatDate(value: string) {
 
 export function StudentHome() {
   const { profile, refreshProfile } = useAuth()
+  const { data: welcome } = useHomeWelcomeSettings()
   const [fullName, setFullName] = React.useState('')
   const [phone, setPhone] = React.useState('')
   const [saving, setSaving] = React.useState(false)
@@ -81,13 +83,18 @@ export function StudentHome() {
           }}
         />
         <div className="relative flex flex-col gap-5">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-14 border border-primary/40">
+          <div className="flex items-start gap-4">
+            <Avatar className="size-14 shrink-0 border border-primary/40">
               <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-semibold text-fg">Olá, {firstName} 👋</h1>
-              <p className="text-sm text-fg-muted">Bem-vindo(a) de volta à tua mentoria.</p>
+              <h1 className="text-xl font-semibold leading-snug text-fg sm:text-2xl">
+                {firstName}, sê muito bem-vindo(a) à Mentoria{' '}
+                <span className="text-primary">{welcome?.mentoriaName}</span>!
+              </h1>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
+                {welcome?.body}
+              </p>
             </div>
           </div>
 

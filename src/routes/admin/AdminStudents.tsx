@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Pencil } from 'lucide-react'
+import { Plus, Pencil, MessageSquareHeart } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { StudentDialog } from '@/routes/admin/components/StudentDialog'
+import { HomeWelcomeDialog } from '@/components/HomeWelcomeDialog'
 import {
   ONBOARDING_STATUS_LABELS,
   ONBOARDING_STATUS_VARIANT,
@@ -24,6 +25,7 @@ export function AdminStudents() {
     open: false,
     student: null,
   })
+  const [welcomeDialogOpen, setWelcomeDialogOpen] = React.useState(false)
 
   const { data: students, isLoading } = useQuery({
     queryKey: ['admin-students'],
@@ -53,10 +55,16 @@ export function AdminStudents() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-fg">Alunos</h1>
-        <Button onClick={() => setDialog({ open: true, student: null })}>
-          <Plus className="size-4" />
-          Novo aluno
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setWelcomeDialogOpen(true)}>
+            <MessageSquareHeart className="size-4" />
+            Boas-vindas do Início
+          </Button>
+          <Button onClick={() => setDialog({ open: true, student: null })}>
+            <Plus className="size-4" />
+            Novo aluno
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -114,6 +122,8 @@ export function AdminStudents() {
         student={dialog.student}
         onSaved={refresh}
       />
+
+      <HomeWelcomeDialog open={welcomeDialogOpen} onOpenChange={setWelcomeDialogOpen} />
     </div>
   )
 }
