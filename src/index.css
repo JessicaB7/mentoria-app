@@ -3,11 +3,11 @@
 @theme {
   --font-sans: system-ui, "Segoe UI", Roboto, sans-serif;
 
-  --color-background: #0d0b09;
-  --color-surface: #18140f;
-  --color-border: #33291a;
-  --color-fg: #f5efe0;
-  --color-fg-muted: #b3a189;
+  --color-background: #17130e;
+  --color-surface: #221c15;
+  --color-border: #3d3220;
+  --color-fg: #f7f1e3;
+  --color-fg-muted: #c5b096;
   --color-primary: #d4af37;
   --color-primary-hover: #e8c765;
   --color-primary-foreground: #1a1508;
