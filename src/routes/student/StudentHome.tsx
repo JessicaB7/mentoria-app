@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
-import { CalendarCheck2, CalendarDays, BookOpen, Radio, UserCog } from 'lucide-react'
+import { CalendarCheck2, CalendarDays, BookOpen, NotebookPen, Radio, UserCog } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useHomeWelcomeSettings } from '@/components/HomeWelcome'
+import { StudentDashboard } from '@/components/StudentDashboard'
 
 const QUICK_LINKS = [
   {
@@ -75,13 +76,23 @@ export function StudentHome() {
   return (
     <div className="flex flex-col gap-6">
       <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-surface p-6">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-60"
-          style={{
-            background:
-              'radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 60%)',
-          }}
-        />
+        {welcome?.coverUrl ? (
+          <>
+            <div
+              className="pointer-events-none absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${welcome.coverUrl})` }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-surface/85" />
+          </>
+        ) : (
+          <div
+            className="pointer-events-none absolute inset-0 opacity-60"
+            style={{
+              background:
+                'radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 60%)',
+            }}
+          />
+        )}
         <div className="relative flex flex-col gap-5">
           <div className="flex items-start gap-4">
             <Avatar className="size-14 shrink-0 border border-primary/40">
@@ -124,8 +135,22 @@ export function StudentHome() {
               )}
             </div>
           )}
+
+          {welcome?.mentorNote && (
+            <div className="flex items-start gap-2 rounded-lg border border-primary/25 bg-primary/5 p-3">
+              <NotebookPen className="mt-0.5 size-4 shrink-0 text-primary" />
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-primary">
+                  Nota da tua mentora
+                </p>
+                <p className="mt-0.5 whitespace-pre-wrap text-sm text-fg">{welcome.mentorNote}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {profile && <StudentDashboard studentId={profile.id} />}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (

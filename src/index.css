@@ -3,22 +3,22 @@
 @theme {
   --font-sans: system-ui, "Segoe UI", Roboto, sans-serif;
 
-  --color-background: #17130e;
-  --color-surface: #221c15;
-  --color-border: #3d3220;
-  --color-fg: #f7f1e3;
-  --color-fg-muted: #c5b096;
-  --color-primary: #d4af37;
-  --color-primary-hover: #e8c765;
-  --color-primary-foreground: #1a1508;
-  --color-danger: #e5534b;
-  --color-success: #5fbf77;
-  --color-warning: #e0a52c;
+  --color-background: #faf6ef;
+  --color-surface: #ffffff;
+  --color-border: #d9cdae;
+  --color-fg: #201a12;
+  --color-fg-muted: #6f6353;
+  --color-primary: #8a6a17;
+  --color-primary-hover: #b8934a;
+  --color-primary-foreground: #fffaf0;
+  --color-danger: #c1352b;
+  --color-success: #2f7d4f;
+  --color-warning: #9c630c;
 }
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * {
