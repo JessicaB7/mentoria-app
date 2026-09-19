@@ -21,6 +21,7 @@ import type {
   PaymentChannel,
   PaymentMethod,
   Profile,
+  StudentFeedback,
 } from '@/types/database'
 
 const PAYMENT_CHANNEL_LABELS: Record<PaymentChannel, string> = {
@@ -84,7 +85,20 @@ function StudentHistory({ student }: { student: Profile }) {
     },
   })
 
-  if (paymentsLoading || progressLoading || crmLoading) {
+  const { data: feedback, isLoading: feedbackLoading } = useQuery({
+    queryKey: ['student-history-feedback', student.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('student_feedback')
+        .select('*')
+        .eq('student_id', student.id)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data as StudentFeedback[]
+    },
+  })
+
+  if (paymentsLoading || progressLoading || crmLoading || feedbackLoading) {
     return (
       <div className="flex h-32 items-center justify-center">
         <Spinner className="size-6" />
@@ -163,6 +177,22 @@ function StudentHistory({ student }: { student: Profile }) {
           )}
         </div>
       </div>
+
+      <div>
+        <p className="mb-2 text-sm font-semibold text-fg">Feedback</p>
+        <div className="flex flex-col divide-y divide-border rounded-md border border-border">
+          {(feedback ?? []).map((f) => (
+            <div key={f.id} className="px-3 py-2 text-sm">
+              <p className="font-medium text-fg">{'★'.repeat(f.rating)}{'☆'.repeat(5 - f.rating)}</p>
+              {f.comment && <p className="mt-0.5 text-xs text-fg-muted">{f.comment}</p>}
+              <p className="mt-0.5 text-xs text-fg-muted">{f.created_at.slice(0, 10)}</p>
+            </div>
+          ))}
+          {(feedback ?? []).length === 0 && (
+            <p className="px-3 py-3 text-sm text-fg-muted">Ainda sem feedback registado.</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -179,6 +209,8 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [email, setEmail] = React.useState('')
   const [phone, setPhone] = React.useState('')
   const [startDate, setStartDate] = React.useState('')
+  const [endDate, setEndDate] = React.useState('')
+  const [cycleNotes, setCycleNotes] = React.useState('')
   const [mainGoal, setMainGoal] = React.useState('')
   const [mentoriaValue, setMentoriaValue] = React.useState('')
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | ''>('')
@@ -199,6 +231,8 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setEmail(student?.email ?? '')
       setPhone(student?.phone ?? '')
       setStartDate(student?.start_date ?? '')
+      setEndDate(student?.end_date ?? '')
+      setCycleNotes(student?.cycle_notes ?? '')
       setMainGoal(student?.main_goal ?? '')
       setMentoriaValue(student?.mentoria_value != null ? String(student.mentoria_value) : '')
       setPaymentMethod(student?.payment_method ?? '')
@@ -222,6 +256,8 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       full_name: fullName,
       phone: phone || null,
       start_date: startDate || null,
+      end_date: endDate || null,
+      cycle_notes: cycleNotes.trim() || null,
       main_goal: mainGoal.trim() || null,
       mentoria_value: mentoriaValue ? Number(mentoriaValue) : null,
       payment_method: paymentMethod || null,
@@ -301,6 +337,26 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           onChange={(e) => setStartDate(e.target.value)}
         />
       </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="student-end-date">Fim previsto do ciclo</Label>
+        <Input
+          id="student-end-date"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </div>
+      {endDate && (
+        <div className="col-span-2 flex flex-col gap-1.5">
+          <Label htmlFor="student-cycle-notes">Notas sobre o ciclo (opcional)</Label>
+          <Input
+            id="student-cycle-notes"
+            placeholder="Ex.: +15 dias — motivo: pausa de dezembro"
+            value={cycleNotes}
+            onChange={(e) => setCycleNotes(e.target.value)}
+          />
+        </div>
+      )}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="student-tax-id">NIF a faturar</Label>
         <Input id="student-tax-id" value={taxId} onChange={(e) => setTaxId(e.target.value)} />

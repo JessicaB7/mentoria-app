@@ -4,6 +4,9 @@ import { ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
+import { SchedulingEmbed } from '@/components/SchedulingEmbed'
+import { GoalList } from '@/components/GoalList'
+import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonList } from '@/routes/student/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
 
@@ -62,12 +65,18 @@ export function AdminPreviewIndividualLessons() {
 
       <IndividualIntro student={data.student} />
 
+      <GoalList studentId={data.student.id} canManage={false} />
+
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há aulas publicadas para este aluno."
         linkBase={`/admin/individual/${studentId}/aulas`}
       />
+
+      <SchedulingEmbed />
+
+      <DeliverablesList studentId={data.student.id} canAdd={false} canReview={false} />
     </div>
   )
 }

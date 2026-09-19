@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, Pencil, Target } from 'lucide-react'
+import { CalendarDays, CalendarCheck2, Clock, Pencil, Target } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
 import type { AppSetting, BusinessType, Profile } from '@/types/database'
@@ -16,6 +16,13 @@ const DEFAULT_INTRO_TEXT =
 const DEFAULT_INTRO_QUOTE =
   'Grandes negócios não nascem de grandes saltos — nascem de pequenos passos consistentes, sessão após sessão.'
 
+const SETTINGS_KEYS = [
+  'individual_intro_text',
+  'individual_intro_quote',
+  'individual_sla_text',
+  'individual_scheduling_url',
+] as const
+
 export function useIndividualIntroSettings() {
   return useQuery({
     queryKey: ['individual-intro-settings'],
@@ -23,15 +30,25 @@ export function useIndividualIntroSettings() {
       const { data, error } = await supabase
         .from('app_settings')
         .select('*')
-        .in('key', ['individual_intro_text', 'individual_intro_quote'])
+        .in('key', SETTINGS_KEYS as unknown as string[])
       if (error) throw error
       const rows = (data ?? []) as AppSetting[]
       const byKey = new Map(rows.map((r) => [r.key, r.value]))
       return {
         text: byKey.get('individual_intro_text') || DEFAULT_INTRO_TEXT,
         quote: byKey.get('individual_intro_quote') || DEFAULT_INTRO_QUOTE,
+        sla: byKey.get('individual_sla_text') || '',
+        schedulingUrl: byKey.get('individual_scheduling_url') || '',
       }
     },
+  })
+}
+
+function formatDate(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
   })
 }
 
@@ -44,13 +61,8 @@ export function IndividualIntro({
 }) {
   const { data: settings } = useIndividualIntroSettings()
 
-  const formattedStartDate = student.start_date
-    ? new Date(student.start_date + 'T00:00:00').toLocaleDateString('pt-PT', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      })
-    : null
+  const formattedStartDate = student.start_date ? formatDate(student.start_date) : null
+  const formattedEndDate = student.end_date ? formatDate(student.end_date) : null
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-primary/30 bg-surface p-5">
@@ -69,7 +81,7 @@ export function IndividualIntro({
           {renderRichText(settings?.text ?? DEFAULT_INTRO_TEXT)}
         </p>
 
-        {(formattedStartDate || student.main_goal) && (
+        {(formattedStartDate || formattedEndDate || student.main_goal) && (
           <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:gap-8">
             {formattedStartDate && (
               <div className="flex items-start gap-2">
@@ -79,6 +91,20 @@ export function IndividualIntro({
                     Início da mentoria
                   </p>
                   <p className="text-sm text-fg">{formattedStartDate}</p>
+                </div>
+              </div>
+            )}
+            {formattedEndDate && (
+              <div className="flex items-start gap-2">
+                <CalendarCheck2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                    Fim previsto
+                  </p>
+                  <p className="text-sm text-fg">{formattedEndDate}</p>
+                  {student.cycle_notes && (
+                    <p className="mt-0.5 text-xs text-fg-muted">{student.cycle_notes}</p>
+                  )}
                 </div>
               </div>
             )}
@@ -122,6 +148,18 @@ export function IndividualIntro({
                 <p className="text-sm text-fg">{student.biggest_challenge}</p>
               </div>
             )}
+          </div>
+        )}
+
+        {settings?.sla && (
+          <div className="flex items-start gap-2 border-t border-border pt-4">
+            <Clock className="mt-0.5 size-4 shrink-0 text-primary" />
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
+                Como comunicamos
+              </p>
+              <p className="whitespace-pre-wrap text-sm text-fg">{settings.sla}</p>
+            </div>
           </div>
         )}
 

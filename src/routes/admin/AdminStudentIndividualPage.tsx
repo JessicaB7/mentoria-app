@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
+import { GoalList } from '@/components/GoalList'
+import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -105,6 +107,8 @@ export function AdminStudentIndividualPage() {
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
+      <GoalList studentId={student.id} canManage />
+
       <LessonList
         lessons={lessons}
         showStudent={false}
@@ -113,6 +117,8 @@ export function AdminStudentIndividualPage() {
         onDelete={deleteLesson}
         onTogglePublished={toggleLessonPublished}
       />
+
+      <DeliverablesList studentId={student.id} canAdd={false} canReview />
 
       <LessonDialog
         open={lessonDialog.open}

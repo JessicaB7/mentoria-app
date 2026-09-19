@@ -12,6 +12,8 @@ export type PaymentChannel = 'transferencia' | 'stripe' | 'debito_direto'
 export type BusinessType = 'independente' | 'empresa' | 'ainda_nao_comecei'
 export type ModuleCategory = 'modulo' | 'individual' | 'ao_vivo'
 export type SessionType = 'boas_vindas' | 'convidado' | 'encerramento' | 'presencial'
+export type GoalStatus = 'por_comecar' | 'em_andamento' | 'concluido'
+export type DeliverableStatus = 'em_analise' | 'revisto'
 
 export type Profile = {
     id: string
@@ -21,6 +23,8 @@ export type Profile = {
     role: UserRole
     avatar_url: string | null
     start_date: string | null
+    end_date: string | null
+    cycle_notes: string | null
     main_goal: string | null
     mentoria_value: number | null
     down_payment: number | null
@@ -132,6 +136,33 @@ export type AppSetting = {
     updated_at: string
 }
 
+export type StudentGoal = {
+    id: string
+    student_id: string
+    title: string
+    status: GoalStatus
+    due_date: string | null
+    position: number
+    created_at: string
+}
+
+export type StudentDeliverable = {
+    id: string
+    student_id: string
+    title: string
+    url: string
+    status: DeliverableStatus
+    created_at: string
+}
+
+export type StudentFeedback = {
+    id: string
+    student_id: string
+    rating: number
+    comment: string | null
+    created_at: string
+}
+
 type Table<Row> = { Row: Row; Insert: Partial<Row>; Update: Partial<Row>; Relationships: [] }
 
 export type Database = {
@@ -147,6 +178,9 @@ export type Database = {
                   crm_tasks: Table<CrmTask>
                   payments: Table<Payment>
                   app_settings: Table<AppSetting>
+                  student_goals: Table<StudentGoal>
+                  student_deliverables: Table<StudentDeliverable>
+                  student_feedback: Table<StudentFeedback>
           }
           Views: Record<string, never>
           Functions: Record<string, never>

@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
+import { SchedulingEmbed } from '@/components/SchedulingEmbed'
+import { GoalList } from '@/components/GoalList'
+import { DeliverablesList } from '@/components/DeliverablesList'
+import { FeedbackForm } from '@/components/FeedbackForm'
 import { LessonList } from '@/routes/student/components/LessonList'
 import type { Lesson } from '@/types/database'
 
@@ -48,11 +52,15 @@ export function StudentIndividualLessons() {
         </p>
       </div>
       {profile && <IndividualIntro student={profile} />}
+      {profile && <GoalList studentId={profile.id} canManage={false} />}
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há nada por aqui."
       />
+      <SchedulingEmbed />
+      {profile && <DeliverablesList studentId={profile.id} canAdd canReview={false} />}
+      {profile && <FeedbackForm studentId={profile.id} endDate={profile.end_date} />}
     </div>
   )
 }
