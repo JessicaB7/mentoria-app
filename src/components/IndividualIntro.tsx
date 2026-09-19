@@ -2,7 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import { CalendarDays, Pencil, Target } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
-import type { AppSetting, Profile } from '@/types/database'
+import type { AppSetting, BusinessType, Profile } from '@/types/database'
+
+const BUSINESS_TYPE_LABELS: Record<BusinessType, string> = {
+  independente: 'Trabalhador independente',
+  empresa: 'Empresa',
+  ainda_nao_comecei: 'Ainda não comecei',
+}
 
 const DEFAULT_INTRO_TEXT =
   'Este é o teu espaço de **acompanhamento individual** — sessões 1:1 pensadas exclusivamente para o teu negócio e para os desafios do teu dia a dia como contabilista.\n\nAqui vais encontrar cada sessão, com o resumo, os materiais partilhados e os próximos passos combinados. Antes do próximo encontro, vale a pena rever a sessão anterior para chegares com tudo fresco.'
@@ -85,6 +91,35 @@ export function IndividualIntro({
                   </p>
                   <p className="text-sm text-fg">{student.main_goal}</p>
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {(student.business_type || student.business_area || student.current_clients || student.biggest_challenge) && (
+          <div className="grid grid-cols-2 gap-3 border-t border-border pt-4 sm:grid-cols-4">
+            {student.business_type && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Tipo de negócio</p>
+                <p className="text-sm text-fg">{BUSINESS_TYPE_LABELS[student.business_type]}</p>
+              </div>
+            )}
+            {student.business_area && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Área de atuação</p>
+                <p className="text-sm text-fg">{student.business_area}</p>
+              </div>
+            )}
+            {student.current_clients && (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Nº de clientes</p>
+                <p className="text-sm text-fg">{student.current_clients}</p>
+              </div>
+            )}
+            {student.biggest_challenge && (
+              <div className="col-span-2 sm:col-span-4">
+                <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">Maior desafio atual</p>
+                <p className="text-sm text-fg">{student.biggest_challenge}</p>
               </div>
             )}
           </div>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { CheckCircle2, Circle, PlayCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { SESSION_TYPE_LABELS } from '@/lib/sessionType'
 import type { Lesson } from '@/types/database'
 
 export function LessonList({
@@ -32,7 +34,10 @@ export function LessonList({
               )}
               <PlayCircle className="size-4 shrink-0 text-fg-muted" />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-fg">{lesson.title}</p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-sm font-medium text-fg">{lesson.title}</p>
+                  {lesson.session_type && <Badge>{SESSION_TYPE_LABELS[lesson.session_type]}</Badge>}
+                </div>
                 {(lesson.session_date || lesson.duration_minutes) && (
                   <p className="text-xs text-fg-muted">
                     {lesson.session_date &&

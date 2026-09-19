@@ -13,9 +13,11 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import type { Lesson, Material, ModuleCategory, Profile, SessionRecording } from '@/types/database'
+import { SESSION_TYPE_LABELS } from '@/lib/sessionType'
+import type { Lesson, Material, ModuleCategory, Profile, SessionRecording, SessionType } from '@/types/database'
 
 const NO_STUDENT = '__none__'
+const NO_SESSION_TYPE = '__none__'
 
 interface LessonDialogProps {
   open: boolean
@@ -47,6 +49,7 @@ export function LessonDialog({
   const [videoPath, setVideoPath] = React.useState<string | null>(null)
   const [studentId, setStudentId] = React.useState<string | null>(null)
   const [sessionDate, setSessionDate] = React.useState('')
+  const [sessionType, setSessionType] = React.useState<SessionType | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [uploadingVideo, setUploadingVideo] = React.useState(false)
   const [recordingTitle, setRecordingTitle] = React.useState('')
@@ -62,6 +65,7 @@ export function LessonDialog({
       setVideoPath(lesson?.video_path ?? null)
       setStudentId(lesson?.student_id ?? defaultStudentId ?? null)
       setSessionDate(lesson?.session_date ?? '')
+      setSessionType(lesson?.session_type ?? null)
     }
   }, [open, lesson, defaultStudentId])
 
@@ -117,6 +121,7 @@ export function LessonDialog({
       video_path: videoPath,
       student_id: category === 'individual' ? studentId : null,
       session_date: category === 'individual' ? sessionDate || null : null,
+      session_type: category === 'ao_vivo' ? sessionType : null,
     }
     const { data, error } = currentLessonId
       ? await supabase.from('lessons').update(payload).eq('id', currentLessonId).select().single()
@@ -245,6 +250,34 @@ export function LessonDialog({
                   onChange={setDescription}
                 />
               </div>
+              {category === 'ao_vivo' && (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="lesson-session-type">Tipo de sessão</Label>
+                  <Select
+                    value={sessionType ?? NO_SESSION_TYPE}
+                    onValueChange={(v) =>
+                      setSessionType(v === NO_SESSION_TYPE ? null : (v as SessionType))
+                    }
+                  >
+                    <SelectTrigger id="lesson-session-type">
+                      <SelectValue placeholder="Normal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NO_SESSION_TYPE}>Normal</SelectItem>
+                      {(Object.entries(SESSION_TYPE_LABELS) as [SessionType, string][]).map(
+                        ([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ),
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-fg-muted">
+                    Dá destaque a sessões fora do padrão (ex.: boas-vindas, convidado).
+                  </p>
+                </div>
+              )}
               {category === 'individual' && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="lesson-session-date">Data da sessão</Label>

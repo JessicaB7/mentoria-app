@@ -8,11 +8,17 @@ import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { PaymentDialog } from '@/routes/admin/components/PaymentDialog'
 import { PaymentPlan } from '@/routes/admin/components/PaymentPlan'
-import type { Payment, PaymentMethod, Profile } from '@/types/database'
+import type { Payment, PaymentChannel, PaymentMethod, Profile } from '@/types/database'
 
 const PAYMENT_LABELS: Record<PaymentMethod, string> = {
   pronto: 'Pronto pagamento',
   prestacoes: 'Prestações',
+}
+
+const PAYMENT_CHANNEL_LABELS: Record<PaymentChannel, string> = {
+  transferencia: 'Transferência',
+  stripe: 'Stripe',
+  debito_direto: 'Débito direto',
 }
 
 export function AdminFinance() {
@@ -88,6 +94,9 @@ export function AdminFinance() {
                   student.installments_count &&
                   ` (${student.installments_count}x)`}
               </Badge>
+            )}
+            {student.payment_channel && (
+              <Badge variant="outline">{PAYMENT_CHANNEL_LABELS[student.payment_channel]}</Badge>
             )}
           </div>
           {student.payment_method === 'prestacoes' && (

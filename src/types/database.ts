@@ -8,7 +8,10 @@ export type CrmStage = 'lead' | 'contacted' | 'proposal' | 'won' | 'lost'
 export type CrmTaskStatus = 'pending' | 'done'
 
 export type PaymentMethod = 'pronto' | 'prestacoes'
+export type PaymentChannel = 'transferencia' | 'stripe' | 'debito_direto'
+export type BusinessType = 'independente' | 'empresa' | 'ainda_nao_comecei'
 export type ModuleCategory = 'modulo' | 'individual' | 'ao_vivo'
+export type SessionType = 'boas_vindas' | 'convidado' | 'encerramento' | 'presencial'
 
 export type Profile = {
     id: string
@@ -22,7 +25,13 @@ export type Profile = {
     mentoria_value: number | null
     down_payment: number | null
     payment_method: PaymentMethod | null
+    payment_channel: PaymentChannel | null
     installments_count: number | null
+    tax_id: string | null
+    business_type: BusinessType | null
+    business_area: string | null
+    current_clients: string | null
+    biggest_challenge: string | null
     created_at: string
 }
 
@@ -46,6 +55,7 @@ export type Lesson = {
     video_path: string | null
     duration_minutes: number | null
     session_date: string | null
+    session_type: SessionType | null
     position: number
     published: boolean
     created_at: string

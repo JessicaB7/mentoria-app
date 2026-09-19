@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
+import { SESSION_TYPE_LABELS } from '@/lib/sessionType'
 import type { Lesson, Profile } from '@/types/database'
 
 export type LessonWithStudent = Lesson & { profiles: Pick<Profile, 'id' | 'full_name' | 'email'> | null }
@@ -29,6 +30,7 @@ export function LessonList({
           <div key={lesson.id} className="flex items-center justify-between gap-3 px-4 py-3">
             <div className="flex min-w-0 items-center gap-2">
               <span className="truncate text-sm text-fg">{lesson.title}</span>
+              {lesson.session_type && <Badge>{SESSION_TYPE_LABELS[lesson.session_type]}</Badge>}
               {lesson.session_date && (
                 <Badge variant="outline">
                   {new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}

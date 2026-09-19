@@ -12,7 +12,28 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import type { CrmContact, CrmTask, LessonProgress, Payment, PaymentMethod, Profile } from '@/types/database'
+import type {
+  BusinessType,
+  CrmContact,
+  CrmTask,
+  LessonProgress,
+  Payment,
+  PaymentChannel,
+  PaymentMethod,
+  Profile,
+} from '@/types/database'
+
+const PAYMENT_CHANNEL_LABELS: Record<PaymentChannel, string> = {
+  transferencia: 'Transferência bancária',
+  stripe: 'Stripe',
+  debito_direto: 'Débito direto',
+}
+
+const BUSINESS_TYPE_LABELS: Record<BusinessType, string> = {
+  independente: 'Trabalhador independente',
+  empresa: 'Empresa',
+  ainda_nao_comecei: 'Ainda não comecei',
+}
 
 const STAGE_LABELS_HISTORY: Record<string, string> = {
   lead: 'Lead',
@@ -161,8 +182,14 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [mainGoal, setMainGoal] = React.useState('')
   const [mentoriaValue, setMentoriaValue] = React.useState('')
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | ''>('')
+  const [paymentChannel, setPaymentChannel] = React.useState<PaymentChannel | ''>('')
   const [downPayment, setDownPayment] = React.useState('')
   const [installmentsCount, setInstallmentsCount] = React.useState('')
+  const [taxId, setTaxId] = React.useState('')
+  const [businessType, setBusinessType] = React.useState<BusinessType | ''>('')
+  const [businessArea, setBusinessArea] = React.useState('')
+  const [currentClients, setCurrentClients] = React.useState('')
+  const [biggestChallenge, setBiggestChallenge] = React.useState('')
   const [saving, setSaving] = React.useState(false)
   const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
 
@@ -175,8 +202,14 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setMainGoal(student?.main_goal ?? '')
       setMentoriaValue(student?.mentoria_value != null ? String(student.mentoria_value) : '')
       setPaymentMethod(student?.payment_method ?? '')
+      setPaymentChannel(student?.payment_channel ?? '')
       setDownPayment(student?.down_payment != null ? String(student.down_payment) : '')
       setInstallmentsCount(student?.installments_count != null ? String(student.installments_count) : '')
+      setTaxId(student?.tax_id ?? '')
+      setBusinessType(student?.business_type ?? '')
+      setBusinessArea(student?.business_area ?? '')
+      setCurrentClients(student?.current_clients ?? '')
+      setBiggestChallenge(student?.biggest_challenge ?? '')
       setCredentials(null)
     }
   }, [open, student])
@@ -192,8 +225,14 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       main_goal: mainGoal.trim() || null,
       mentoria_value: mentoriaValue ? Number(mentoriaValue) : null,
       payment_method: paymentMethod || null,
+      payment_channel: paymentChannel || null,
       down_payment: paymentMethod === 'prestacoes' && downPayment ? Number(downPayment) : null,
       installments_count: paymentMethod === 'prestacoes' && installmentsCount ? Number(installmentsCount) : null,
+      tax_id: taxId.trim() || null,
+      business_type: businessType || null,
+      business_area: businessArea.trim() || null,
+      current_clients: currentClients.trim() || null,
+      biggest_challenge: biggestChallenge.trim() || null,
     }
 
     if (student) {
@@ -262,6 +301,57 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           onChange={(e) => setStartDate(e.target.value)}
         />
       </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="student-tax-id">NIF a faturar</Label>
+        <Input id="student-tax-id" value={taxId} onChange={(e) => setTaxId(e.target.value)} />
+      </div>
+      <div className="col-span-2 flex flex-col gap-1.5">
+        <Label htmlFor="student-business-type">Tipo de negócio</Label>
+        <Select
+          value={businessType || undefined}
+          onValueChange={(v) => setBusinessType(v as BusinessType)}
+        >
+          <SelectTrigger id="student-business-type">
+            <SelectValue placeholder="Selecionar…" />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.entries(BUSINESS_TYPE_LABELS) as [BusinessType, string][]).map(
+              ([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ),
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="student-business-area">Área de atuação</Label>
+        <Input
+          id="student-business-area"
+          placeholder="Ex.: Contabilidade digital"
+          value={businessArea}
+          onChange={(e) => setBusinessArea(e.target.value)}
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="student-current-clients">Nº de clientes atuais</Label>
+        <Input
+          id="student-current-clients"
+          placeholder="Ex.: 5"
+          value={currentClients}
+          onChange={(e) => setCurrentClients(e.target.value)}
+        />
+      </div>
+      <div className="col-span-2 flex flex-col gap-1.5">
+        <Label htmlFor="student-biggest-challenge">Maior desafio atual</Label>
+        <Textarea
+          id="student-biggest-challenge"
+          placeholder="Ex.: Definir preços e ter uma estrutura de serviços clara."
+          value={biggestChallenge}
+          onChange={(e) => setBiggestChallenge(e.target.value)}
+        />
+      </div>
       <div className="col-span-2 flex flex-col gap-1.5">
         <Label htmlFor="student-main-goal">Objetivo principal</Label>
         <Textarea
@@ -271,7 +361,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           onChange={(e) => setMainGoal(e.target.value)}
         />
         <p className="text-xs text-fg-muted">
-          Aparece no início do Acompanhamento Individual do aluno.
+          Este diagnóstico aparece no início do Acompanhamento Individual do aluno.
         </p>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -285,7 +375,7 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           onChange={(e) => setMentoriaValue(e.target.value)}
         />
       </div>
-      <div className={paymentMethod === 'prestacoes' ? 'flex flex-col gap-1.5' : 'col-span-2 flex flex-col gap-1.5'}>
+      <div className="flex flex-col gap-1.5">
         <Label htmlFor="student-payment">Método de pagamento</Label>
         <Select value={paymentMethod || undefined} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
           <SelectTrigger id="student-payment">
@@ -294,6 +384,26 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
           <SelectContent>
             <SelectItem value="pronto">Pronto pagamento</SelectItem>
             <SelectItem value="prestacoes">Prestações</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="student-payment-channel">Canal de recebimento</Label>
+        <Select
+          value={paymentChannel || undefined}
+          onValueChange={(v) => setPaymentChannel(v as PaymentChannel)}
+        >
+          <SelectTrigger id="student-payment-channel">
+            <SelectValue placeholder="Selecionar…" />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.entries(PAYMENT_CHANNEL_LABELS) as [PaymentChannel, string][]).map(
+              ([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ),
+            )}
           </SelectContent>
         </Select>
       </div>
