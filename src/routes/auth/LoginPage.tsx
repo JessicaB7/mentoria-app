@@ -17,6 +17,24 @@ export function LoginPage() {
   const [resetSent, setResetSent] = React.useState(false)
   const [resetting, setResetting] = React.useState(false)
 
+  React.useEffect(() => {
+    // Verifica se houve redirecionamento com erro no URL (ex: hash ou query)
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+    const searchParams = new URLSearchParams(window.location.search)
+
+    const errorCode = hashParams.get('error_code') || searchParams.get('error_code')
+    const errorDescription =
+      hashParams.get('error_description') || searchParams.get('error_description')
+
+    if (errorCode || errorDescription) {
+      if (errorCode === 'otp_expired' || errorDescription?.toLowerCase().includes('expired')) {
+        setError('O link de acesso ou confirmação expirou. Podes pedir um novo link abaixo.')
+      } else if (errorDescription) {
+        setError(errorDescription)
+      }
+    }
+  }, [])
+
   if (!loading && session && profile) {
     return <Navigate to={profile.role === 'admin' ? '/admin' : '/aluno'} replace />
   }
