@@ -12,10 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Checkbox } from '@/components/ui/checkbox'
-import { CHALLENGE_OPTIONS } from '@/lib/challenges'
 import type {
-  BusinessType,
   CrmContact,
   CrmTask,
   LessonProgress,
@@ -29,12 +26,6 @@ import type {
 const PAYMENT_CHANNEL_LABELS: Record<PaymentChannel, string> = {
   transferencia: 'Transferência bancária',
   gocardless: 'GoCardless',
-}
-
-const BUSINESS_TYPE_LABELS: Record<BusinessType, string> = {
-  independente: 'Trabalhador independente',
-  empresa: 'Empresa',
-  ainda_nao_comecei: 'Ainda não comecei',
 }
 
 const STAGE_LABELS_HISTORY: Record<string, string> = {
@@ -219,16 +210,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [downPayment, setDownPayment] = React.useState('')
   const [installmentsCount, setInstallmentsCount] = React.useState('')
   const [taxId, setTaxId] = React.useState('')
-  const [businessType, setBusinessType] = React.useState<BusinessType | ''>('')
-  const [businessArea, setBusinessArea] = React.useState('')
-  const [currentClients, setCurrentClients] = React.useState('')
-  const [currentServices, setCurrentServices] = React.useState('')
-  const [challenges, setChallenges] = React.useState<string[]>([])
-  const [otherChallenges, setOtherChallenges] = React.useState('')
-  const [enrollmentReason, setEnrollmentReason] = React.useState('')
-  const [successDefinition, setSuccessDefinition] = React.useState('')
-  const [learningGoals, setLearningGoals] = React.useState('')
-  const [additionalNotes, setAdditionalNotes] = React.useState('')
   const [saving, setSaving] = React.useState(false)
   const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
 
@@ -247,16 +228,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setDownPayment(student?.down_payment != null ? String(student.down_payment) : '')
       setInstallmentsCount(student?.installments_count != null ? String(student.installments_count) : '')
       setTaxId(student?.tax_id ?? '')
-      setBusinessType(student?.business_type ?? '')
-      setBusinessArea(student?.business_area ?? '')
-      setCurrentClients(student?.current_clients ?? '')
-      setCurrentServices(student?.current_services ?? '')
-      setChallenges(student?.challenges ?? [])
-      setOtherChallenges(student?.other_challenges ?? '')
-      setEnrollmentReason(student?.enrollment_reason ?? '')
-      setSuccessDefinition(student?.success_definition ?? '')
-      setLearningGoals(student?.learning_goals ?? '')
-      setAdditionalNotes(student?.additional_notes ?? '')
       setCredentials(null)
     }
   }, [open, student])
@@ -278,16 +249,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       down_payment: paymentMethod === 'prestacoes' && downPayment ? Number(downPayment) : null,
       installments_count: paymentMethod === 'prestacoes' && installmentsCount ? Number(installmentsCount) : null,
       tax_id: taxId.trim() || null,
-      business_type: businessType || null,
-      business_area: businessArea.trim() || null,
-      current_clients: currentClients.trim() || null,
-      current_services: currentServices.trim() || null,
-      challenges: challenges.length > 0 ? challenges : null,
-      other_challenges: otherChallenges.trim() || null,
-      enrollment_reason: enrollmentReason.trim() || null,
-      success_definition: successDefinition.trim() || null,
-      learning_goals: learningGoals.trim() || null,
-      additional_notes: additionalNotes.trim() || null,
     }
 
     if (student) {
@@ -319,12 +280,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
     setSaving(false)
     setCredentials({ email, password: data.password })
     onSaved()
-  }
-
-  function toggleChallenge(option: string) {
-    setChallenges((current) =>
-      current.includes(option) ? current.filter((c) => c !== option) : [...current, option],
-    )
   }
 
   function copyCredentials() {
@@ -385,120 +340,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="student-tax-id">NIF a faturar</Label>
         <Input id="student-tax-id" value={taxId} onChange={(e) => setTaxId(e.target.value)} />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-business-type">Tipo de negócio</Label>
-        <Select
-          value={businessType || undefined}
-          onValueChange={(v) => setBusinessType(v as BusinessType)}
-        >
-          <SelectTrigger id="student-business-type">
-            <SelectValue placeholder="Selecionar…" />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.entries(BUSINESS_TYPE_LABELS) as [BusinessType, string][]).map(
-              ([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ),
-            )}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="student-business-area">Área de atuação</Label>
-        <Input
-          id="student-business-area"
-          placeholder="Ex.: Contabilidade digital"
-          value={businessArea}
-          onChange={(e) => setBusinessArea(e.target.value)}
-        />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="student-current-clients">Nº de clientes atuais</Label>
-        <Input
-          id="student-current-clients"
-          placeholder="Ex.: 5"
-          value={currentClients}
-          onChange={(e) => setCurrentClients(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 mt-2 border-t border-border pt-3">
-        <p className="text-sm font-semibold text-fg">Diagnóstico inicial</p>
-        <p className="text-xs text-fg-muted">
-          O mesmo formulário "Check-in Mentoria" que já usavas no Notion.
-        </p>
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-current-services">Quais os serviços que tens atualmente?</Label>
-        <Textarea
-          id="student-current-services"
-          value={currentServices}
-          onChange={(e) => setCurrentServices(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label>Quais os teus maiores desafios atualmente?</Label>
-        <div className="grid grid-cols-1 gap-2 rounded-md border border-border p-3 sm:grid-cols-2">
-          {CHALLENGE_OPTIONS.map((option) => (
-            <label key={option} className="flex items-center gap-2 text-sm text-fg">
-              <Checkbox
-                checked={challenges.includes(option)}
-                onCheckedChange={() => toggleChallenge(option)}
-              />
-              {option}
-            </label>
-          ))}
-        </div>
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-other-challenges">
-          Outros desafios não enumerados no ponto anterior
-        </Label>
-        <Input
-          id="student-other-challenges"
-          value={otherChallenges}
-          onChange={(e) => setOtherChallenges(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-enrollment-reason">
-          Quais os motivos de te teres inscrito neste programa?
-        </Label>
-        <Textarea
-          id="student-enrollment-reason"
-          value={enrollmentReason}
-          onChange={(e) => setEnrollmentReason(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-success-definition">
-          Quando terminares a mentoria, como vais saber que foi um sucesso para ti?
-        </Label>
-        <Textarea
-          id="student-success-definition"
-          value={successDefinition}
-          onChange={(e) => setSuccessDefinition(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-learning-goals">
-          Tens alguma dúvida ou algo que gostavas MESMO de aprender?
-        </Label>
-        <Textarea
-          id="student-learning-goals"
-          value={learningGoals}
-          onChange={(e) => setLearningGoals(e.target.value)}
-        />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-additional-notes">Algo tópico a acrescentar?</Label>
-        <Textarea
-          id="student-additional-notes"
-          value={additionalNotes}
-          onChange={(e) => setAdditionalNotes(e.target.value)}
-        />
       </div>
       <div className="col-span-2 flex flex-col gap-1.5">
         <Label htmlFor="student-main-goal">Objetivo principal</Label>
