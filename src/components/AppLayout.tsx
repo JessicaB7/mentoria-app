@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { isStaff } from '@/types/database'
+import { AdminNotifications } from '@/components/AdminNotifications'
 
 const studentNav = [
   { to: '/aluno/inicio', label: 'Início', icon: Home, end: false },
@@ -31,6 +32,7 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
 
   return (
     <div className="flex min-h-svh">
+      {variant === 'admin' && <AdminNotifications />}
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
         <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
         <div className="flex items-center gap-2.5 border-b border-border px-4 py-4">
