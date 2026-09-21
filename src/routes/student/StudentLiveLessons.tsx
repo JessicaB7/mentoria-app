@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { LessonList } from '@/routes/student/components/LessonList'
+import { NextLiveSessionBanner } from '@/components/NextLiveSessionBanner'
 import type { Lesson } from '@/types/database'
 
 export function StudentLiveLessons() {
@@ -44,6 +45,7 @@ export function StudentLiveLessons() {
         <h1 className="text-xl font-semibold text-fg">Aula ao vivo</h1>
         <p className="text-sm text-fg-muted">Hot Seats e outras sessões em grupo ao vivo.</p>
       </div>
+      <NextLiveSessionBanner lessons={data.lessons} />
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}

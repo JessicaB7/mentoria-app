@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
+import { NextLiveSessionBanner } from '@/components/NextLiveSessionBanner'
 import type { Lesson } from '@/types/database'
 
 export function AdminLiveLessons() {
@@ -69,6 +70,8 @@ export function AdminLiveLessons() {
           Nova aula
         </Button>
       </div>
+
+      <NextLiveSessionBanner lessons={lessons} />
 
       <LessonList
         lessons={lessons}

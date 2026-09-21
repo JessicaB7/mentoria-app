@@ -120,7 +120,8 @@ export function LessonDialog({
       published,
       video_path: videoPath,
       student_id: category === 'individual' ? studentId : null,
-      session_date: category === 'individual' ? sessionDate || null : null,
+      session_date:
+        category === 'individual' || category === 'ao_vivo' ? sessionDate || null : null,
       session_type: category === 'ao_vivo' ? sessionType : null,
     }
     const { data, error } = currentLessonId
@@ -278,7 +279,7 @@ export function LessonDialog({
                   </p>
                 </div>
               )}
-              {category === 'individual' && (
+              {(category === 'individual' || category === 'ao_vivo') && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="lesson-session-date">Data da sessão</Label>
                   <Input
@@ -287,6 +288,12 @@ export function LessonDialog({
                     value={sessionDate}
                     onChange={(e) => setSessionDate(e.target.value)}
                   />
+                  {category === 'ao_vivo' && (
+                    <p className="text-xs text-fg-muted">
+                      Opcional — deixa em branco para aulas sem data própria (ex.: "Como funcionam
+                      os Hot Seats"). Aulas com data aparecem em destaque como próxima sessão.
+                    </p>
+                  )}
                 </div>
               )}
               {category === 'individual' && (
