@@ -54,12 +54,12 @@ export function StudentIndividualLessons() {
       </div>
       {profile && <IndividualIntro student={profile} />}
       {profile && <DiagnosticCard student={profile} />}
-      {profile && <GoalList studentId={profile.id} canManage={false} />}
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há nada por aqui."
       />
+      {profile && <GoalList studentId={profile.id} canManage={false} />}
       <SchedulingEmbed />
       {profile && <DeliverablesList studentId={profile.id} canAdd canReview={false} />}
       {profile && <FeedbackForm studentId={profile.id} endDate={profile.end_date} />}

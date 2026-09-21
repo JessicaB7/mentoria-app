@@ -68,14 +68,14 @@ export function AdminPreviewIndividualLessons() {
 
       <DiagnosticCard student={data.student} />
 
-      <GoalList studentId={data.student.id} canManage={false} />
-
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há aulas publicadas para este aluno."
         linkBase={`/admin/individual/${studentId}/aulas`}
       />
+
+      <GoalList studentId={data.student.id} canManage={false} />
 
       <SchedulingEmbed />
 

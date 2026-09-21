@@ -110,8 +110,6 @@ export function AdminStudentIndividualPage() {
 
       <DiagnosticCard student={student} />
 
-      <GoalList studentId={student.id} canManage />
-
       <LessonList
         lessons={lessons}
         showStudent={false}
@@ -120,6 +118,8 @@ export function AdminStudentIndividualPage() {
         onDelete={deleteLesson}
         onTogglePublished={toggleLessonPublished}
       />
+
+      <GoalList studentId={student.id} canManage />
 
       <DeliverablesList studentId={student.id} canAdd={false} canReview />
 
