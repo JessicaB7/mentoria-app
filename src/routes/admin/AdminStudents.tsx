@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { StudentDialog } from '@/routes/admin/components/StudentDialog'
 import { HomeWelcomeDialog } from '@/components/HomeWelcomeDialog'
+import { AdminAttentionPanel } from '@/components/AdminAttentionPanel'
 import type { Profile } from '@/types/database'
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -55,6 +56,8 @@ export function AdminStudents() {
           </Button>
         </div>
       </div>
+
+      <AdminAttentionPanel />
 
       {isLoading ? (
         <div className="flex h-40 items-center justify-center">
