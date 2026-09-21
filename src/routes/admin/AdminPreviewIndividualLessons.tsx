@@ -4,7 +4,6 @@ import { ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
-import { OnboardingSection } from '@/components/OnboardingSection'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
 import { GoalList } from '@/components/GoalList'
@@ -64,10 +63,6 @@ export function AdminPreviewIndividualLessons() {
         <h1 className="text-xl font-semibold text-fg">Acompanhamento individual</h1>
         <p className="text-sm text-fg-muted">A ver como {data.student.full_name} vê esta secção.</p>
       </div>
-
-      {data.student.onboarding_status !== 'ativo' && (
-        <OnboardingSection student={data.student} editable={false} />
-      )}
 
       <IndividualIntro student={data.student} />
 

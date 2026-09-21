@@ -27,7 +27,7 @@ export function DiagnosticCard({ student }: { student: Profile }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Diagnóstico inicial</CardTitle>
+        <CardTitle className="text-base">Check-in Mentoria</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <Field label="Serviços atuais" value={student.current_services} />

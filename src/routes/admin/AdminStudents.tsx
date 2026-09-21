@@ -8,10 +8,6 @@ import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { StudentDialog } from '@/routes/admin/components/StudentDialog'
 import { HomeWelcomeDialog } from '@/components/HomeWelcomeDialog'
-import {
-  ONBOARDING_STATUS_LABELS,
-  ONBOARDING_STATUS_VARIANT,
-} from '@/lib/onboardingStatus'
 import type { Profile } from '@/types/database'
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -36,14 +32,7 @@ export function AdminStudents() {
         .eq('role', 'student')
         .order('created_at', { ascending: false })
       if (error) throw error
-      const rows = data as Profile[]
-      // Quem ainda está a meio do onboarding aparece primeiro.
-      return rows.sort((a, b) => {
-        const aPending = a.onboarding_status !== 'ativo'
-        const bPending = b.onboarding_status !== 'ativo'
-        if (aPending !== bPending) return aPending ? -1 : 1
-        return b.created_at.localeCompare(a.created_at)
-      })
+      return data as Profile[]
     },
   })
 
@@ -89,11 +78,6 @@ export function AdminStudents() {
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  {student.onboarding_status !== 'ativo' && (
-                    <Badge variant={ONBOARDING_STATUS_VARIANT[student.onboarding_status]}>
-                      {ONBOARDING_STATUS_LABELS[student.onboarding_status]}
-                    </Badge>
-                  )}
                   {student.mentoria_value != null && (
                     <Badge variant="outline">{student.mentoria_value.toFixed(2)}€</Badge>
                   )}

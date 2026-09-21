@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
-import { OnboardingSection } from '@/components/OnboardingSection'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
 import { GoalList } from '@/components/GoalList'
@@ -53,9 +52,6 @@ export function StudentIndividualLessons() {
           Regras gerais e as sessões 1:1 dedicadas a ti.
         </p>
       </div>
-      {profile && profile.onboarding_status !== 'ativo' && (
-        <OnboardingSection student={profile} editable={false} />
-      )}
       {profile && <IndividualIntro student={profile} />}
       {profile && <DiagnosticCard student={profile} />}
       {profile && <GoalList studentId={profile.id} canManage={false} />}
