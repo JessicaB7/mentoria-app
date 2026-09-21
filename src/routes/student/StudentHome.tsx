@@ -75,6 +75,12 @@ export function StudentHome() {
 
   return (
     <div className="flex flex-col gap-6">
+      <img
+        src="/mentoria-banner.png"
+        alt="Mentoria Contabilista Explica"
+        className="w-full rounded-xl border border-primary/30 object-cover"
+      />
+
       <div className="relative overflow-hidden rounded-xl border border-primary/30 bg-surface p-6">
         {welcome?.coverUrl ? (
           <>
