@@ -15,6 +15,7 @@ export function LessonList({
   onEdit,
   onDelete,
   onTogglePublished,
+  leadingItem,
 }: {
   lessons: LessonWithStudent[]
   showStudent: boolean
@@ -22,10 +23,12 @@ export function LessonList({
   onEdit: (lesson: Lesson) => void
   onDelete: (lesson: Lesson) => void
   onTogglePublished: (lesson: Lesson) => void
+  leadingItem?: React.ReactNode
 }) {
   return (
     <Card>
       <CardContent className="flex flex-col divide-y divide-border p-0">
+        {leadingItem}
         {lessons.map((lesson) => (
           <div key={lesson.id} className="flex items-center justify-between gap-3 px-4 py-3">
             <div className="flex min-w-0 items-center gap-2">

@@ -2,9 +2,10 @@ import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ArrowLeft, Eye, Plus } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Circle, ClipboardList, Eye, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
@@ -108,11 +109,6 @@ export function AdminStudentIndividualPage() {
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
-      <DiagnosticCard student={student} editable />
-      <p className="-mt-3 px-1 text-xs text-fg-muted">
-        Preenchido pelo próprio aluno, na secção "Check-in Mentoria" antes da Sessão 1.
-      </p>
-
       <LessonList
         lessons={lessons}
         showStudent={false}
@@ -120,7 +116,29 @@ export function AdminStudentIndividualPage() {
         onEdit={(lesson) => setLessonDialog({ open: true, lesson })}
         onDelete={deleteLesson}
         onTogglePublished={toggleLessonPublished}
+        leadingItem={
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex min-w-0 items-center gap-2">
+              {student.current_services ||
+              (student.challenges && student.challenges.length > 0) ||
+              student.other_challenges ||
+              student.enrollment_reason ||
+              student.success_definition ||
+              student.learning_goals ||
+              student.additional_notes ? (
+                <CheckCircle2 className="size-4 shrink-0 text-success" />
+              ) : (
+                <Circle className="size-4 shrink-0 text-fg-muted" />
+              )}
+              <ClipboardList className="size-4 shrink-0 text-fg-muted" />
+              <span className="truncate text-sm text-fg">Check-in Mentoria</span>
+              <Badge variant="outline">Preenchido pelo aluno</Badge>
+            </div>
+          </div>
+        }
       />
+
+      <DiagnosticCard student={student} editable />
 
       <GoalList studentId={student.id} canManage />
 
