@@ -13,14 +13,12 @@ import { Spinner } from '@/components/ui/spinner'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ONBOARDING_STATUS_LABELS, ONBOARDING_STATUS_ORDER } from '@/lib/onboardingStatus'
 import { CHALLENGE_OPTIONS } from '@/lib/challenges'
 import type {
   BusinessType,
   CrmContact,
   CrmTask,
   LessonProgress,
-  OnboardingStatus,
   Payment,
   PaymentChannel,
   PaymentMethod,
@@ -214,7 +212,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [startDate, setStartDate] = React.useState('')
   const [endDate, setEndDate] = React.useState('')
   const [cycleNotes, setCycleNotes] = React.useState('')
-  const [onboardingStatus, setOnboardingStatus] = React.useState<OnboardingStatus>('convidado')
   const [mainGoal, setMainGoal] = React.useState('')
   const [mentoriaValue, setMentoriaValue] = React.useState('')
   const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod | ''>('')
@@ -243,7 +240,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       setStartDate(student?.start_date ?? '')
       setEndDate(student?.end_date ?? '')
       setCycleNotes(student?.cycle_notes ?? '')
-      setOnboardingStatus(student?.onboarding_status ?? 'convidado')
       setMainGoal(student?.main_goal ?? '')
       setMentoriaValue(student?.mentoria_value != null ? String(student.mentoria_value) : '')
       setPaymentMethod(student?.payment_method ?? '')
@@ -275,7 +271,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       start_date: startDate || null,
       end_date: endDate || null,
       cycle_notes: cycleNotes.trim() || null,
-      onboarding_status: onboardingStatus,
       main_goal: mainGoal.trim() || null,
       mentoria_value: mentoriaValue ? Number(mentoriaValue) : null,
       payment_method: paymentMethod || null,
@@ -343,28 +338,6 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
       <div className="col-span-2 flex flex-col gap-1.5">
         <Label htmlFor="student-name">Nome</Label>
         <Input id="student-name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-      </div>
-      <div className="col-span-2 flex flex-col gap-1.5">
-        <Label htmlFor="student-onboarding">Estado de onboarding</Label>
-        <Select
-          value={onboardingStatus}
-          onValueChange={(v) => setOnboardingStatus(v as OnboardingStatus)}
-        >
-          <SelectTrigger id="student-onboarding">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {ONBOARDING_STATUS_ORDER.map((status) => (
-              <SelectItem key={status} value={status}>
-                {ONBOARDING_STATUS_LABELS[status]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-fg-muted">
-          Contrato e débito direto continuam a tratar-se por email/GoCardless — isto é só o teu
-          checklist de onde cada aluno está no processo.
-        </p>
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="student-email">Email</Label>

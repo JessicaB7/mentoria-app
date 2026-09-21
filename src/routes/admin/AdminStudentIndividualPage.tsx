@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
+import { OnboardingStatusCard } from '@/components/OnboardingStatusCard'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
@@ -105,6 +106,8 @@ export function AdminStudentIndividualPage() {
           </Button>
         </div>
       </div>
+
+      <OnboardingStatusCard student={student} />
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
