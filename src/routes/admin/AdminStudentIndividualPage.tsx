@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
-import { OnboardingStatusCard } from '@/components/OnboardingStatusCard'
+import { OnboardingSection } from '@/components/OnboardingSection'
+import { OnboardingSectionDialog } from '@/components/OnboardingSectionDialog'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
@@ -24,6 +25,7 @@ export function AdminStudentIndividualPage() {
     lesson: null,
   })
   const [introDialogOpen, setIntroDialogOpen] = React.useState(false)
+  const [onboardingDialogOpen, setOnboardingDialogOpen] = React.useState(false)
 
   const { data: student, isLoading: studentLoading } = useQuery({
     queryKey: ['student-profile', studentId],
@@ -107,7 +109,11 @@ export function AdminStudentIndividualPage() {
         </div>
       </div>
 
-      <OnboardingStatusCard student={student} />
+      <OnboardingSection
+        student={student}
+        editable
+        onEditClick={() => setOnboardingDialogOpen(true)}
+      />
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
@@ -138,6 +144,7 @@ export function AdminStudentIndividualPage() {
       />
 
       <IndividualIntroDialog open={introDialogOpen} onOpenChange={setIntroDialogOpen} />
+      <OnboardingSectionDialog open={onboardingDialogOpen} onOpenChange={setOnboardingDialogOpen} />
     </div>
   )
 }
