@@ -10,15 +10,18 @@ export function LessonList({
   completedIds,
   emptyLabel,
   linkBase = '/aluno/aulas',
+  leadingItem,
 }: {
   lessons: Lesson[]
   completedIds: Set<string>
   emptyLabel?: string
   linkBase?: string
+  leadingItem?: React.ReactNode
 }) {
   return (
     <Card>
       <CardContent className="flex flex-col divide-y divide-border p-0">
+        {leadingItem}
         {lessons.map((lesson) => {
           const done = completedIds.has(lesson.id)
           return (

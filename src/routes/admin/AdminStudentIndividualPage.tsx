@@ -9,7 +9,6 @@ import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
-import { DiagnosticDialog } from '@/components/DiagnosticDialog'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
@@ -24,7 +23,6 @@ export function AdminStudentIndividualPage() {
     lesson: null,
   })
   const [introDialogOpen, setIntroDialogOpen] = React.useState(false)
-  const [diagnosticDialogOpen, setDiagnosticDialogOpen] = React.useState(false)
 
   const { data: student, isLoading: studentLoading } = useQuery({
     queryKey: ['student-profile', studentId],
@@ -110,11 +108,10 @@ export function AdminStudentIndividualPage() {
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
-      <DiagnosticCard
-        student={student}
-        editable
-        onEditClick={() => setDiagnosticDialogOpen(true)}
-      />
+      <DiagnosticCard student={student} editable />
+      <p className="-mt-3 px-1 text-xs text-fg-muted">
+        Preenchido pelo próprio aluno, na secção "Check-in Mentoria" antes da Sessão 1.
+      </p>
 
       <LessonList
         lessons={lessons}
@@ -141,11 +138,6 @@ export function AdminStudentIndividualPage() {
       />
 
       <IndividualIntroDialog open={introDialogOpen} onOpenChange={setIntroDialogOpen} />
-      <DiagnosticDialog
-        open={diagnosticDialogOpen}
-        onOpenChange={setDiagnosticDialogOpen}
-        student={student}
-      />
     </div>
   )
 }

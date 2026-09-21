@@ -11,6 +11,7 @@ import { StudentHome } from '@/routes/student/StudentHome'
 import { StudentLiveLessons } from '@/routes/student/StudentLiveLessons'
 import { StudentRecordedContent } from '@/routes/student/StudentRecordedContent'
 import { StudentIndividualLessons } from '@/routes/student/StudentIndividualLessons'
+import { StudentCheckIn } from '@/routes/student/StudentCheckIn'
 import { StudentModulePage } from '@/routes/student/StudentModulePage'
 import { LessonPage } from '@/routes/student/LessonPage'
 import { AdminLiveLessons } from '@/routes/admin/AdminLiveLessons'
@@ -60,6 +61,7 @@ function App() {
                 <Route path="/aluno/ao-vivo" element={<StudentLiveLessons />} />
                 <Route path="/aluno/gravado" element={<StudentRecordedContent />} />
                 <Route path="/aluno/individual" element={<StudentIndividualLessons />} />
+                <Route path="/aluno/check-in" element={<StudentCheckIn />} />
                 <Route path="/aluno/modulos/:moduleId" element={<StudentModulePage />} />
                 <Route path="/aluno/aulas/:lessonId" element={<LessonPage />} />
               </Route>

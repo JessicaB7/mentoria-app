@@ -1,10 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Circle, ClipboardList } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
-import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
@@ -66,13 +65,31 @@ export function AdminPreviewIndividualLessons() {
 
       <IndividualIntro student={data.student} />
 
-      <DiagnosticCard student={data.student} />
-
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há aulas publicadas para este aluno."
         linkBase={`/admin/individual/${studentId}/aulas`}
+        leadingItem={
+          <div className="flex items-center gap-3 px-4 py-3">
+            {data.student.current_services ||
+            (data.student.challenges && data.student.challenges.length > 0) ||
+            data.student.other_challenges ||
+            data.student.enrollment_reason ||
+            data.student.success_definition ||
+            data.student.learning_goals ||
+            data.student.additional_notes ? (
+              <CheckCircle2 className="size-5 shrink-0 text-success" />
+            ) : (
+              <Circle className="size-5 shrink-0 text-fg-muted" />
+            )}
+            <ClipboardList className="size-4 shrink-0 text-fg-muted" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-fg">Check-in Mentoria</p>
+              <p className="text-xs text-fg-muted">Preenchido pelo aluno — vê o resultado na ficha</p>
+            </div>
+          </div>
+        }
       />
 
       <GoalList studentId={data.student.id} canManage={false} />

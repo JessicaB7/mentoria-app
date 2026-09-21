@@ -1,15 +1,28 @@
+import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { CheckCircle2, Circle, ClipboardList } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { IndividualIntro } from '@/components/IndividualIntro'
-import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
 import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
 import { FeedbackForm } from '@/components/FeedbackForm'
 import { LessonList } from '@/routes/student/components/LessonList'
-import type { Lesson } from '@/types/database'
+import type { Lesson, Profile } from '@/types/database'
+
+function hasCheckIn(profile: Profile) {
+  return Boolean(
+    profile.current_services ||
+      (profile.challenges && profile.challenges.length > 0) ||
+      profile.other_challenges ||
+      profile.enrollment_reason ||
+      profile.success_definition ||
+      profile.learning_goals ||
+      profile.additional_notes,
+  )
+}
 
 export function StudentIndividualLessons() {
   const { profile } = useAuth()
@@ -53,11 +66,29 @@ export function StudentIndividualLessons() {
         </p>
       </div>
       {profile && <IndividualIntro student={profile} />}
-      {profile && <DiagnosticCard student={profile} />}
       <LessonList
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há nada por aqui."
+        leadingItem={
+          profile && (
+            <Link
+              to="/aluno/check-in"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-border/20"
+            >
+              {hasCheckIn(profile) ? (
+                <CheckCircle2 className="size-5 shrink-0 text-success" />
+              ) : (
+                <Circle className="size-5 shrink-0 text-fg-muted" />
+              )}
+              <ClipboardList className="size-4 shrink-0 text-fg-muted" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-fg">Check-in Mentoria</p>
+                <p className="text-xs text-fg-muted">O teu ponto de partida — responde antes da Sessão 1</p>
+              </div>
+            </Link>
+          )
+        }
       />
       {profile && <GoalList studentId={profile.id} canManage={false} />}
       <SchedulingEmbed />
