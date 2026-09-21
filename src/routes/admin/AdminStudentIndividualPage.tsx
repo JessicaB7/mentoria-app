@@ -7,10 +7,10 @@ import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
-import { GoalList } from '@/components/GoalList'
 import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
@@ -24,6 +24,7 @@ export function AdminStudentIndividualPage() {
     lesson: null,
   })
   const [introDialogOpen, setIntroDialogOpen] = React.useState(false)
+  const [checkInDialogOpen, setCheckInDialogOpen] = React.useState(false)
 
   const { data: student, isLoading: studentLoading } = useQuery({
     queryKey: ['student-profile', studentId],
@@ -117,7 +118,10 @@ export function AdminStudentIndividualPage() {
         onDelete={deleteLesson}
         onTogglePublished={toggleLessonPublished}
         leadingItem={
-          <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <button
+            onClick={() => setCheckInDialogOpen(true)}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-border/20"
+          >
             <div className="flex min-w-0 items-center gap-2">
               {student.current_services ||
               (student.challenges && student.challenges.length > 0) ||
@@ -134,13 +138,9 @@ export function AdminStudentIndividualPage() {
               <span className="truncate text-sm text-fg">Check-in Mentoria</span>
               <Badge variant="outline">Preenchido pelo aluno</Badge>
             </div>
-          </div>
+          </button>
         }
       />
-
-      <DiagnosticCard student={student} editable />
-
-      <GoalList studentId={student.id} canManage />
 
       <DeliverablesList studentId={student.id} canAdd={false} canReview />
 
@@ -156,6 +156,15 @@ export function AdminStudentIndividualPage() {
       />
 
       <IndividualIntroDialog open={introDialogOpen} onOpenChange={setIntroDialogOpen} />
+
+      <Dialog open={checkInDialogOpen} onOpenChange={setCheckInDialogOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Check-in Mentoria — {student.full_name}</DialogTitle>
+          </DialogHeader>
+          <DiagnosticCard student={student} editable />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

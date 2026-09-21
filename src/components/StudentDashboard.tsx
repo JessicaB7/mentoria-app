@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, PartyPopper, PlayCircle, Radio } from 'lucide-react'
+import { PartyPopper, PlayCircle, Radio } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import type { Lesson, Module, StudentGoal } from '@/types/database'
+import type { Lesson, Module } from '@/types/database'
 
 type LessonWithModule = Lesson & { modules: Pick<Module, 'position'> | null }
 
@@ -24,7 +23,6 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
         { data: curriculum, error: curriculumError },
         { data: progress, error: progressError },
         { data: liveSessions, error: liveError },
-        { data: goals, error: goalsError },
       ] = await Promise.all([
         supabase
           .from('lessons')
@@ -41,12 +39,10 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
           .gte('session_date', new Date().toISOString().slice(0, 10))
           .order('session_date', { ascending: true })
           .limit(1),
-        supabase.from('student_goals').select('*').eq('student_id', studentId).eq('status', 'concluido'),
       ])
       if (curriculumError) throw curriculumError
       if (progressError) throw progressError
       if (liveError) throw liveError
-      if (goalsError) throw goalsError
 
       const lessons = (curriculum ?? []) as unknown as LessonWithModule[]
       const completedIds = new Set((progress ?? []).map((p) => p.lesson_id))
@@ -64,7 +60,6 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
         completed: completedIds.size,
         nextLesson,
         nextLiveSession: ((liveSessions ?? [])[0] as Lesson | undefined) ?? null,
-        completedGoals: (goals ?? []) as StudentGoal[],
       }
     },
   })
@@ -146,20 +141,6 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
           </Card>
         )}
       </div>
-
-      {data.completedGoals.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-fg-muted">
-            <CheckCircle2 className="size-3.5 text-success" />
-            Objetivos alcançados
-          </span>
-          {data.completedGoals.map((goal) => (
-            <Badge key={goal.id} variant="success">
-              {goal.title}
-            </Badge>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
