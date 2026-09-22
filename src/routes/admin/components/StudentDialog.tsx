@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
-import { Copy } from 'lucide-react'
+import { Copy, Trash2, TriangleAlert } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -212,9 +212,12 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [taxId, setTaxId] = React.useState('')
   const [saving, setSaving] = React.useState(false)
   const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = React.useState(false)
+  const [deleting, setDeleting] = React.useState(false)
 
   React.useEffect(() => {
     if (open) {
+      setConfirmingDelete(false)
       setFullName(student?.full_name ?? '')
       setEmail(student?.email ?? '')
       setPhone(student?.phone ?? '')
@@ -286,6 +289,22 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
     if (!credentials) return
     navigator.clipboard.writeText(`Email: ${credentials.email}\nPalavra-passe: ${credentials.password}`)
     toast.success('Credenciais copiadas.')
+  }
+
+  async function handleDelete() {
+    if (!student) return
+    setDeleting(true)
+    const { data, error } = await supabase.functions.invoke('delete-student', {
+      body: { student_id: student.id },
+    })
+    setDeleting(false)
+    if (error || data?.error) {
+      toast.error(data?.error ?? 'Não foi possível apagar o aluno.')
+      return
+    }
+    toast.success('Aluno apagado.')
+    onOpenChange(false)
+    onSaved()
   }
 
   const studentFormFields = (
@@ -456,6 +475,27 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
               <Button onClick={() => onOpenChange(false)}>Fechar</Button>
             </DialogFooter>
           </div>
+        ) : confirmingDelete && student ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-3 rounded-md border border-danger/40 bg-danger/10 p-3 text-sm text-fg">
+              <TriangleAlert className="size-5 shrink-0 text-danger" />
+              <div>
+                <p className="font-medium">Apagar {student.full_name}?</p>
+                <p className="mt-1 text-fg-muted">
+                  Esta ação é irreversível: apaga o acesso do aluno e todos os dados associados
+                  (aulas individuais, progresso, pagamentos, entregáveis e feedback).
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={deleting}>
+                {deleting ? 'A apagar…' : 'Sim, apagar aluno'}
+              </Button>
+            </DialogFooter>
+          </div>
         ) : (
           <>
             {student ? (
@@ -472,16 +512,24 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
             ) : (
               studentFormFields
             )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={saving || !fullName.trim() || (!student && !email.trim())}
-              >
-                Guardar
-              </Button>
+            <DialogFooter className={student ? 'justify-between' : undefined}>
+              {student && (
+                <Button variant="outline" className="text-danger hover:text-danger" onClick={() => setConfirmingDelete(true)}>
+                  <Trash2 className="size-4" />
+                  Apagar aluno
+                </Button>
+              )}
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={saving || !fullName.trim() || (!student && !email.trim())}
+                >
+                  Guardar
+                </Button>
+              </div>
             </DialogFooter>
           </>
         )}
