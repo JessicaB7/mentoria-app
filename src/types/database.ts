@@ -93,6 +93,7 @@ export type SessionRecording = {
   lesson_id: string
   title: string
   url: string
+  session_date: string | null
   position: number
   created_at: string
 }

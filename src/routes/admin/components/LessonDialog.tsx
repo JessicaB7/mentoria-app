@@ -54,6 +54,7 @@ export function LessonDialog({
   const [uploadingVideo, setUploadingVideo] = React.useState(false)
   const [recordingTitle, setRecordingTitle] = React.useState('')
   const [recordingUrl, setRecordingUrl] = React.useState('')
+  const [recordingDate, setRecordingDate] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -191,6 +192,7 @@ export function LessonDialog({
       lesson_id: currentLessonId,
       title: recordingTitle.trim(),
       url: recordingUrl.trim(),
+      session_date: recordingDate || null,
       position: recordings?.length ?? 0,
     })
     if (error) {
@@ -199,6 +201,7 @@ export function LessonDialog({
     }
     setRecordingTitle('')
     setRecordingUrl('')
+    setRecordingDate('')
     toast.success('Gravação adicionada.')
     refetchRecordings()
   }
@@ -212,6 +215,7 @@ export function LessonDialog({
     if (!nextOpen) {
       queryClient.invalidateQueries({ queryKey: ['admin-modules'] })
       queryClient.invalidateQueries({ queryKey: ['admin-lessons'] })
+      queryClient.invalidateQueries({ queryKey: ['live-recordings'] })
     }
     onOpenChange(nextOpen)
   }
@@ -414,6 +418,16 @@ export function LessonDialog({
                     onChange={(e) => setRecordingUrl(e.target.value)}
                   />
                 </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="recording-date">Data da sessão</Label>
+                  <Input
+                    id="recording-date"
+                    type="date"
+                    value={recordingDate}
+                    onChange={(e) => setRecordingDate(e.target.value)}
+                  />
+                  <p className="text-xs text-fg-muted">Aparece na galeria de gravações do aluno.</p>
+                </div>
                 <Button
                   type="button"
                   variant="outline"
@@ -435,6 +449,11 @@ export function LessonDialog({
                         className="text-sm text-fg hover:underline"
                       >
                         {recording.title}
+                        {recording.session_date && (
+                          <span className="ml-2 text-xs text-fg-muted">
+                            {new Date(recording.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}
+                          </span>
+                        )}
                       </a>
                       <button
                         onClick={() => handleRecordingDelete(recording)}
