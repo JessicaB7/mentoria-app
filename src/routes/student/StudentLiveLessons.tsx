@@ -5,6 +5,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { LessonList } from '@/routes/student/components/LessonList'
 import { NextLiveSessionBanner } from '@/components/NextLiveSessionBanner'
 import { LiveRecordingsGallery } from '@/components/LiveRecordingsGallery'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { Lesson } from '@/types/database'
 
 export function StudentLiveLessons() {
@@ -46,13 +47,23 @@ export function StudentLiveLessons() {
         <h1 className="text-xl font-semibold text-fg">Aula ao vivo</h1>
         <p className="text-sm text-fg-muted">Hot Seats e outras sessões em grupo ao vivo.</p>
       </div>
-      <LessonList
-        lessons={data.lessons}
-        completedIds={data.completedIds}
-        emptyLabel="Ainda não há aulas ao vivo publicadas."
-      />
-      <NextLiveSessionBanner lessons={data.lessons} />
-      <LiveRecordingsGallery />
+      <Tabs defaultValue="aulas">
+        <TabsList className="max-w-full overflow-x-auto">
+          <TabsTrigger value="aulas">Aulas ao vivo</TabsTrigger>
+          <TabsTrigger value="gravacoes">Gravação das sessões ao vivo</TabsTrigger>
+        </TabsList>
+        <TabsContent value="aulas" className="flex flex-col gap-6">
+          <LessonList
+            lessons={data.lessons}
+            completedIds={data.completedIds}
+            emptyLabel="Ainda não há aulas ao vivo publicadas."
+          />
+          <NextLiveSessionBanner lessons={data.lessons} />
+        </TabsContent>
+        <TabsContent value="gravacoes">
+          <LiveRecordingsGallery lessons={data.lessons} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

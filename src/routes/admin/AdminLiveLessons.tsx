@@ -9,6 +9,7 @@ import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import { NextLiveSessionBanner } from '@/components/NextLiveSessionBanner'
 import { LiveRecordingsGallery } from '@/components/LiveRecordingsGallery'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { Lesson } from '@/types/database'
 
 export function AdminLiveLessons() {
@@ -72,18 +73,29 @@ export function AdminLiveLessons() {
         </Button>
       </div>
 
-      <LessonList
-        lessons={lessons}
-        showStudent={false}
-        emptyLabel="Sem aulas ao vivo ainda."
-        onEdit={(lesson) => setLessonDialog({ open: true, lesson })}
-        onDelete={deleteLesson}
-        onTogglePublished={toggleLessonPublished}
-      />
-
-      <NextLiveSessionBanner lessons={lessons} />
-
-      <LiveRecordingsGallery />
+      <Tabs defaultValue="aulas">
+        <TabsList className="max-w-full overflow-x-auto">
+          <TabsTrigger value="aulas">Aulas ao vivo</TabsTrigger>
+          <TabsTrigger value="gravacoes">Gravação das sessões ao vivo</TabsTrigger>
+        </TabsList>
+        <TabsContent value="aulas" className="flex flex-col gap-6">
+          <LessonList
+            lessons={lessons}
+            showStudent={false}
+            emptyLabel="Sem aulas ao vivo ainda."
+            onEdit={(lesson) => setLessonDialog({ open: true, lesson })}
+            onDelete={deleteLesson}
+            onTogglePublished={toggleLessonPublished}
+          />
+          <NextLiveSessionBanner lessons={lessons} />
+        </TabsContent>
+        <TabsContent value="gravacoes">
+          <LiveRecordingsGallery
+            lessons={lessons}
+            onSelect={(lesson) => setLessonDialog({ open: true, lesson })}
+          />
+        </TabsContent>
+      </Tabs>
 
       <LessonDialog
         open={lessonDialog.open}
