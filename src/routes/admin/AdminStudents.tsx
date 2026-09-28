@@ -31,9 +31,10 @@ export function AdminStudents() {
         .from('profiles')
         .select('*')
         .eq('role', 'student')
-        .order('created_at', { ascending: false })
       if (error) throw error
-      return data as Profile[]
+      return (data as Profile[]).sort((a, b) =>
+        (a.full_name ?? '').localeCompare(b.full_name ?? '', 'pt', { sensitivity: 'base' }),
+      )
     },
   })
 
