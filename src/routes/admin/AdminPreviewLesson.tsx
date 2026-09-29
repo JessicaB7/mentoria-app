@@ -108,13 +108,17 @@ export function AdminPreviewLesson() {
 
       {videoUrl ? (
         <video controls className="w-full max-w-3xl rounded-lg border border-border bg-black" src={videoUrl} />
+      ) : lesson.category === 'individual' ? (
+        recordings.length === 0 && <p className="text-sm text-fg-muted">Gravação ainda não disponível.</p>
       ) : (
         <p className="text-sm text-fg-muted">Vídeo ainda não disponível.</p>
       )}
 
       {recordings.length > 0 && (
         <div className="mt-2 flex flex-col gap-2">
-          <h2 className="text-sm font-semibold text-fg">Gravações das sessões</h2>
+          <h2 className="text-sm font-semibold text-fg">
+            {lesson.category === 'individual' ? 'Gravação' : 'Gravações das sessões'}
+          </h2>
           {recordings.map((recording) => (
             <a
               key={recording.id}

@@ -24,6 +24,7 @@ export function LessonList({
         {leadingItem}
         {lessons.map((lesson) => {
           const done = completedIds.has(lesson.id)
+          const duration = lesson.category === 'individual' ? null : lesson.duration_minutes
           return (
             <Link
               key={lesson.id}
@@ -41,12 +42,12 @@ export function LessonList({
                   <p className="truncate text-sm font-medium text-fg">{lesson.title}</p>
                   {lesson.session_type && <Badge>{SESSION_TYPE_LABELS[lesson.session_type]}</Badge>}
                 </div>
-                {(lesson.session_date || lesson.duration_minutes) && (
+                {(lesson.session_date || duration) && (
                   <p className="text-xs text-fg-muted">
                     {lesson.session_date &&
                       new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}
-                    {lesson.session_date && lesson.duration_minutes && ' · '}
-                    {lesson.duration_minutes && `${lesson.duration_minutes} min`}
+                    {lesson.session_date && duration && ' · '}
+                    {duration && `${duration} min`}
                   </p>
                 )}
               </div>

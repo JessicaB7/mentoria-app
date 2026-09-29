@@ -13,8 +13,16 @@ export function getPublicUrl(bucket: 'module-covers', path: string) {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 }
 
+// O Storage do Supabase rejeita nomes com acentos e alguns símbolos (ex.: "Declaração nº 1.pdf")
+function safeFileName(name: string) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w.-]+/g, '_')
+}
+
 export async function uploadFile(bucket: Bucket, file: File) {
-  const path = `${crypto.randomUUID()}-${file.name}`
+  const path = `${crypto.randomUUID()}-${safeFileName(file.name)}`
   const { error } = await supabase.storage.from(bucket).upload(path, file)
   if (error) throw error
   return path

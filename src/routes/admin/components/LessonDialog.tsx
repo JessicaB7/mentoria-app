@@ -55,6 +55,8 @@ export function LessonDialog({
   const [recordingTitle, setRecordingTitle] = React.useState('')
   const [recordingUrl, setRecordingUrl] = React.useState('')
   const [recordingDate, setRecordingDate] = React.useState('')
+  // Sessões individuais: uma única gravação (link para a pasta da Drive), guardada em session_recordings
+  const [recordingLink, setRecordingLink] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -108,8 +110,12 @@ export function LessonDialog({
       if (error) throw error
       return data as SessionRecording[]
     },
-    enabled: !!currentLessonId && category === 'ao_vivo',
+    enabled: !!currentLessonId && (category === 'ao_vivo' || category === 'individual'),
   })
+
+  React.useEffect(() => {
+    if (open && category === 'individual') setRecordingLink(recordings?.[0]?.url ?? '')
+  }, [open, category, recordings])
 
   async function handleSaveDetails() {
     if (!title.trim()) return
@@ -137,9 +143,30 @@ export function LessonDialog({
       toast.error('Não foi possível guardar a aula.')
       return
     }
-    setCurrentLessonId((data as Lesson).id)
+    const savedId = (data as Lesson).id
+    if (category === 'individual' && !(await saveRecordingLink(savedId))) {
+      toast.error('A aula foi guardada, mas não foi possível guardar a gravação.')
+      return
+    }
+    setCurrentLessonId(savedId)
     toast.success('Aula guardada.')
     onSaved()
+  }
+
+  async function saveRecordingLink(lessonId: string) {
+    const link = recordingLink.trim()
+    const existing = recordings?.[0]
+    const { error } = existing
+      ? link
+        ? await supabase.from('session_recordings').update({ url: link }).eq('id', existing.id)
+        : await supabase.from('session_recordings').delete().eq('id', existing.id)
+      : link
+        ? await supabase
+            .from('session_recordings')
+            .insert({ lesson_id: lessonId, title: 'Ver gravação', url: link, position: 0 })
+        : { error: null }
+    if (!error) refetchRecordings()
+    return !error
   }
 
   async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -173,8 +200,8 @@ export function LessonDialog({
       if (error) throw error
       toast.success('Material adicionado.')
       refetchMaterials()
-    } catch {
-      toast.error('Falha ao carregar o material.')
+    } catch (err) {
+      toast.error(`Falha ao carregar o material: ${(err as Error).message}`)
     } finally {
       e.target.value = ''
     }
@@ -325,7 +352,7 @@ export function LessonDialog({
                   </p>
                 </div>
               )}
-              {category !== 'modulo' && (
+              {category === 'ao_vivo' && (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="lesson-duration">Duração (minutos)</Label>
                   <Input
@@ -337,19 +364,32 @@ export function LessonDialog({
                   />
                 </div>
               )}
-              <div className="flex flex-col gap-1.5">
-                <Label>Vídeo</Label>
-                <div className="flex items-center gap-2">
-                  <Button type="button" variant="outline" size="sm" asChild>
-                    <label className="cursor-pointer">
-                      {uploadingVideo ? <Spinner /> : <Upload className="size-4" />}
-                      {videoPath ? 'Substituir vídeo' : 'Carregar vídeo'}
-                      <input type="file" accept="video/*" className="hidden" onChange={handleVideoUpload} />
-                    </label>
-                  </Button>
-                  {videoPath && <span className="text-xs text-fg-muted">Vídeo carregado</span>}
+              {category === 'individual' ? (
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="lesson-recording-link">Gravação</Label>
+                  <Input
+                    id="lesson-recording-link"
+                    placeholder="https://drive.google.com/…"
+                    value={recordingLink}
+                    onChange={(e) => setRecordingLink(e.target.value)}
+                  />
+                  <p className="text-xs text-fg-muted">Link para a pasta da Drive com a gravação da sessão.</p>
                 </div>
-              </div>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  <Label>Vídeo</Label>
+                  <div className="flex items-center gap-2">
+                    <Button type="button" variant="outline" size="sm" asChild>
+                      <label className="cursor-pointer">
+                        {uploadingVideo ? <Spinner /> : <Upload className="size-4" />}
+                        {videoPath ? 'Substituir vídeo' : 'Carregar vídeo'}
+                        <input type="file" accept="video/*" className="hidden" onChange={handleVideoUpload} />
+                      </label>
+                    </Button>
+                    {videoPath && <span className="text-xs text-fg-muted">Vídeo carregado</span>}
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Switch checked={published} onCheckedChange={setPublished} id="lesson-published" />
                 <Label htmlFor="lesson-published">Publicada (visível para alunos)</Label>
