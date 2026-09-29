@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
-import { Copy, Trash2, TriangleAlert } from 'lucide-react'
+import { Copy, KeyRound, Trash2, TriangleAlert } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -211,7 +211,12 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
   const [installmentsCount, setInstallmentsCount] = React.useState('')
   const [taxId, setTaxId] = React.useState('')
   const [saving, setSaving] = React.useState(false)
-  const [credentials, setCredentials] = React.useState<{ email: string; password: string } | null>(null)
+  const [credentials, setCredentials] = React.useState<{
+    email: string
+    password: string
+    kind: 'created' | 'reset'
+  } | null>(null)
+  const [resettingAccess, setResettingAccess] = React.useState(false)
   const [confirmingDelete, setConfirmingDelete] = React.useState(false)
   const [deleting, setDeleting] = React.useState(false)
 
@@ -281,14 +286,33 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
     }
     await supabase.from('profiles').update(enrollmentFields).eq('id', data.user_id)
     setSaving(false)
-    setCredentials({ email, password: data.password })
+    setCredentials({ email, password: data.password, kind: 'created' })
     onSaved()
   }
 
   function copyCredentials() {
     if (!credentials) return
-    navigator.clipboard.writeText(`Email: ${credentials.email}\nPalavra-passe: ${credentials.password}`)
+    navigator.clipboard.writeText(
+      `Acesso à Mentoria: ${window.location.origin}\n` +
+        `Email: ${credentials.email}\n` +
+        `Palavra-passe temporária: ${credentials.password}\n\n` +
+        'No primeiro acesso vais definir a tua própria palavra-passe.',
+    )
     toast.success('Credenciais copiadas.')
+  }
+
+  async function handleResetAccess() {
+    if (!student) return
+    setResettingAccess(true)
+    const { data, error } = await supabase.functions.invoke('reset-student-access', {
+      body: { student_id: student.id },
+    })
+    setResettingAccess(false)
+    if (error || data?.error) {
+      toast.error(data?.error ?? 'Não foi possível gerar um novo acesso.')
+      return
+    }
+    setCredentials({ email: data.email ?? student.email, password: data.password, kind: 'reset' })
   }
 
   async function handleDelete() {
@@ -457,14 +481,16 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
         {credentials ? (
           <div className="flex flex-col gap-3">
             <p className="text-sm text-fg-muted">
-              Conta criada. Partilha estas credenciais com o aluno (só ficam visíveis agora):
+              {credentials.kind === 'created' ? 'Conta criada.' : 'Novo acesso gerado — a palavra-passe anterior deixou de funcionar.'}{' '}
+              Partilha estas credenciais com o aluno (só ficam visíveis agora). No primeiro acesso, o
+              aluno vai definir a sua própria palavra-passe.
             </p>
             <div className="rounded-md border border-border bg-background p-3 text-sm">
               <p>
                 <span className="text-fg-muted">Email:</span> {credentials.email}
               </p>
               <p>
-                <span className="text-fg-muted">Palavra-passe:</span> {credentials.password}
+                <span className="text-fg-muted">Palavra-passe temporária:</span> {credentials.password}
               </p>
             </div>
             <Button variant="outline" onClick={copyCredentials} className="w-fit">
@@ -514,10 +540,16 @@ export function StudentDialog({ open, onOpenChange, student, onSaved }: StudentD
             )}
             <DialogFooter className={student ? 'justify-between' : undefined}>
               {student && (
-                <Button variant="outline" className="text-danger hover:text-danger" onClick={() => setConfirmingDelete(true)}>
-                  <Trash2 className="size-4" />
-                  Apagar aluno
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="text-danger hover:text-danger" onClick={() => setConfirmingDelete(true)}>
+                    <Trash2 className="size-4" />
+                    Apagar aluno
+                  </Button>
+                  <Button variant="outline" onClick={handleResetAccess} disabled={resettingAccess}>
+                    <KeyRound className="size-4" />
+                    {resettingAccess ? 'A gerar…' : 'Gerar novo acesso'}
+                  </Button>
+                </div>
               )}
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => onOpenChange(false)}>

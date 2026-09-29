@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, CalendarCheck2, Clock, Pencil, Target } from 'lucide-react'
+import { CalendarDays, CalendarCheck2, Clock, Pencil } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
 import type { AppSetting, BusinessType, Profile } from '@/types/database'
@@ -81,7 +81,7 @@ export function IndividualIntro({
           {renderRichText(settings?.text ?? DEFAULT_INTRO_TEXT)}
         </p>
 
-        {(formattedStartDate || formattedEndDate || student.main_goal) && (
+        {(formattedStartDate || formattedEndDate) && (
           <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:gap-8">
             {formattedStartDate && (
               <div className="flex items-start gap-2">
@@ -105,17 +105,6 @@ export function IndividualIntro({
                   {student.cycle_notes && (
                     <p className="mt-0.5 text-xs text-fg-muted">{student.cycle_notes}</p>
                   )}
-                </div>
-              </div>
-            )}
-            {student.main_goal && (
-              <div className="flex items-start gap-2">
-                <Target className="mt-0.5 size-4 shrink-0 text-primary" />
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-fg-muted">
-                    Objetivo principal
-                  </p>
-                  <p className="text-sm text-fg">{student.main_goal}</p>
                 </div>
               </div>
             )}

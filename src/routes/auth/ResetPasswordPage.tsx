@@ -76,7 +76,7 @@ export function ResetPasswordPage() {
       return
     }
     setSubmitting(true)
-    const { error } = await supabase.auth.updateUser({ password })
+    const { error } = await supabase.auth.updateUser({ password, data: { password_set: true } })
     setSubmitting(false)
     if (error) {
       setError('Não foi possível definir a nova password. Pede um novo link de recuperação.')

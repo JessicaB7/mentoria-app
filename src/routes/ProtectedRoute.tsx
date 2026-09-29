@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
+import { SetPasswordPage } from '@/routes/auth/SetPasswordPage'
 import { isStaff, type UserRole } from '@/types/database'
 
 export function ProtectedRoute({ role }: { role?: Extract<UserRole, 'student'> | 'staff' }) {
@@ -26,6 +27,11 @@ export function ProtectedRoute({ role }: { role?: Extract<UserRole, 'student'> |
 
   if (!allowed) {
     return <Navigate to={isStaff(profile.role) ? '/admin' : '/aluno'} replace />
+  }
+
+  // Alunos definem a própria password no primeiro acesso (a conta é criada com uma password gerada)
+  if (profile.role === 'student' && !session.user.user_metadata?.password_set) {
+    return <SetPasswordPage />
   }
 
   return <Outlet />

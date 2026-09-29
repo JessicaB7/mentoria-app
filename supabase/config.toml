@@ -6,5 +6,8 @@ verify_jwt = true
 [functions.delete-student]
 verify_jwt = true
 
+[functions.reset-student-access]
+verify_jwt = true
+
 [functions.calendly-webhook]
 verify_jwt = false
