@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
 import { SchedulingEmbed } from '@/components/SchedulingEmbed'
-import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonList } from '@/routes/student/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
 
@@ -99,8 +98,6 @@ export function AdminPreviewIndividualLessons() {
       />
 
       <SchedulingEmbed />
-
-      <DeliverablesList studentId={data.student.id} canAdd={false} canReview={false} />
 
       <Dialog open={checkInDialogOpen} onOpenChange={setCheckInDialogOpen}>
         <DialogContent className="max-w-xl">

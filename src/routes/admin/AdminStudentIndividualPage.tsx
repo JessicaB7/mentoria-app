@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
-import { DeliverablesList } from '@/components/DeliverablesList'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -141,8 +140,6 @@ export function AdminStudentIndividualPage() {
           </button>
         }
       />
-
-      <DeliverablesList studentId={student.id} canAdd={false} canReview />
 
       <LessonDialog
         open={lessonDialog.open}
