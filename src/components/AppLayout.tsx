@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { GraduationCap, Home, Radio, BookOpen, UserCog, Users, KanbanSquare, LogOut, Euro } from 'lucide-react'
+import { GraduationCap, Home, Radio, BookOpen, UserCog, Users, KanbanSquare, LogOut, Euro, Wrench } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
@@ -12,12 +12,14 @@ const studentNav = [
   { to: '/aluno/ao-vivo', label: 'Aula ao vivo', icon: Radio, end: false },
   { to: '/aluno/gravado', label: 'Conteúdo gravado', icon: BookOpen, end: false },
   { to: '/aluno/individual', label: 'Acompanhamento individual', icon: UserCog, end: false },
+  { to: '/aluno/ferramentas', label: 'Ferramentas', icon: Wrench, end: false },
 ]
 
 const adminNav = [
   { to: '/admin/ao-vivo', label: 'Aula ao vivo', icon: Radio, end: false },
   { to: '/admin/gravado', label: 'Conteúdo gravado', icon: BookOpen, end: false },
   { to: '/admin/individual', label: 'Acompanhamento individual', icon: UserCog, end: false },
+  { to: '/admin/ferramentas', label: 'Ferramentas', icon: Wrench, end: false },
   { to: '/admin/alunos', label: 'Alunos', icon: Users, end: false },
   { to: '/admin/crm', label: 'CRM', icon: KanbanSquare, end: false },
   { to: '/admin/financeiro', label: 'Financeiro', icon: Euro, end: false },

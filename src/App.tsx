@@ -14,6 +14,7 @@ import { StudentIndividualLessons } from '@/routes/student/StudentIndividualLess
 import { StudentCheckIn } from '@/routes/student/StudentCheckIn'
 import { StudentModulePage } from '@/routes/student/StudentModulePage'
 import { LessonPage } from '@/routes/student/LessonPage'
+import { StudentTools } from '@/routes/student/StudentTools'
 import { AdminLiveLessons } from '@/routes/admin/AdminLiveLessons'
 import { AdminRecordedContent } from '@/routes/admin/AdminRecordedContent'
 import { AdminIndividualHub } from '@/routes/admin/AdminIndividualHub'
@@ -24,6 +25,7 @@ import { AdminModulePage } from '@/routes/admin/AdminModulePage'
 import { AdminStudents } from '@/routes/admin/AdminStudents'
 import { AdminCrm } from '@/routes/admin/AdminCrm'
 import { AdminFinance } from '@/routes/admin/AdminFinance'
+import { AdminTools } from '@/routes/admin/AdminTools'
 import { Spinner } from '@/components/ui/spinner'
 
 const queryClient = new QueryClient()
@@ -61,6 +63,7 @@ function App() {
                 <Route path="/aluno/ao-vivo" element={<StudentLiveLessons />} />
                 <Route path="/aluno/gravado" element={<StudentRecordedContent />} />
                 <Route path="/aluno/individual" element={<StudentIndividualLessons />} />
+                <Route path="/aluno/ferramentas" element={<StudentTools />} />
                 <Route path="/aluno/check-in" element={<StudentCheckIn />} />
                 <Route path="/aluno/modulos/:moduleId" element={<StudentModulePage />} />
                 <Route path="/aluno/aulas/:lessonId" element={<LessonPage />} />
@@ -83,6 +86,7 @@ function App() {
                   element={<AdminPreviewLesson />}
                 />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
+                <Route path="/admin/ferramentas" element={<AdminTools />} />
                 <Route path="/admin/alunos" element={<AdminStudents />} />
                 <Route path="/admin/crm" element={<AdminCrm />} />
                 <Route path="/admin/financeiro" element={<AdminFinance />} />

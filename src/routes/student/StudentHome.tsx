@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CalendarCheck2, CalendarDays, BookOpen, NotebookPen, Radio, UserCog } from 'lucide-react'
+import { CalendarCheck2, CalendarDays, BookOpen, NotebookPen, Radio, UserCog, Wrench } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useHomeWelcomeSettings } from '@/components/HomeWelcome'
@@ -23,6 +23,12 @@ const QUICK_LINKS = [
     icon: UserCog,
     label: 'Acompanhamento individual',
     description: 'As tuas sessões 1:1 e o teu plano de ação.',
+  },
+  {
+    to: '/aluno/ferramentas',
+    icon: Wrench,
+    label: 'Ferramentas',
+    description: 'Templates e ferramentas prontos a usar.',
   },
 ]
 
@@ -125,7 +131,7 @@ export function StudentHome() {
 
       {profile && <StudentDashboard studentId={profile.id} />}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (
           <Link
             key={to}
