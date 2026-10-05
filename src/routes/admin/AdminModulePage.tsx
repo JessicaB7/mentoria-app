@@ -2,9 +2,9 @@ import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Paperclip, Pencil, Plus, Trash2, Video, VideoOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { getPublicUrl } from '@/lib/storage'
+import { ModuleHeader } from '@/components/ModuleHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +14,7 @@ import { ModuleDialog } from '@/routes/admin/components/ModuleDialog'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import type { Lesson, Module } from '@/types/database'
 
-type ModuleWithLessons = Module & { lessons: Lesson[] }
+type ModuleWithLessons = Module & { lessons: (Lesson & { materials: { id: string }[] })[] }
 
 export function AdminModulePage() {
   const { moduleId } = useParams<{ moduleId: string }>()
@@ -30,7 +30,7 @@ export function AdminModulePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('modules')
-        .select('*, lessons(*)')
+        .select('*, lessons(*, materials(id))')
         .eq('id', moduleId!)
         .single()
       if (error) throw error
@@ -71,43 +71,60 @@ export function AdminModulePage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
       <Link to="/admin/gravado" className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg">
         <ArrowLeft className="size-4" /> Voltar aos módulos
       </Link>
 
-      {module.cover_path && (
-        <img
-          src={getPublicUrl('module-covers', module.cover_path)}
-          alt=""
-          className="aspect-video w-full rounded-lg object-cover"
-        />
-      )}
-
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h1 className="text-xl font-semibold text-fg">{module.title}</h1>
-          {module.description && <p className="text-sm text-fg-muted">{module.description}</p>}
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setModuleDialogOpen(true)}>
-            <Pencil className="size-4" />
-            Editar módulo
-          </Button>
-          <Button size="sm" onClick={() => setLessonDialog({ open: true, lesson: null })}>
-            <Plus className="size-4" />
-            Aula
-          </Button>
-        </div>
-      </div>
+      <ModuleHeader
+        module={module}
+        lessons={module.lessons.filter((l) => l.published)}
+        actions={
+          <div className="mt-auto flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => setModuleDialogOpen(true)}>
+              <Pencil className="size-4" />
+              Editar módulo
+            </Button>
+            <Button size="sm" onClick={() => setLessonDialog({ open: true, lesson: null })}>
+              <Plus className="size-4" />
+              Aula
+            </Button>
+          </div>
+        }
+      />
 
       <Card>
         <CardContent className="flex flex-col divide-y divide-border p-0">
-          {module.lessons.map((lesson) => (
+          {module.lessons.map((lesson, index) => (
             <div key={lesson.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="truncate text-sm text-fg">{lesson.title}</span>
-                {!lesson.published && <Badge variant="outline">Rascunho</Badge>}
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-border/40 text-xs font-semibold text-fg-muted">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate text-sm font-medium text-fg">{lesson.title}</span>
+                    {!lesson.published && <Badge variant="outline">Rascunho</Badge>}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-fg-muted">
+                    {lesson.video_path ? (
+                      <span className="flex items-center gap-1">
+                        <Video className="size-3" /> Vídeo
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-warning">
+                        <VideoOff className="size-3" /> Sem vídeo
+                      </span>
+                    )}
+                    {lesson.duration_minutes && <span>{lesson.duration_minutes} min</span>}
+                    {lesson.materials.length > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Paperclip className="size-3" />
+                        {lesson.materials.length} {lesson.materials.length === 1 ? 'material' : 'materiais'}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <Switch checked={lesson.published} onCheckedChange={() => toggleLessonPublished(lesson)} />
