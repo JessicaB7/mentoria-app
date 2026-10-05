@@ -40,7 +40,7 @@ function AttentionGroup({
           {students.map((s, i) => (
             <React.Fragment key={s.id}>
               <Link
-                to={`/admin/individual/${s.id}`}
+                to={`/admin/alunos/individual/${s.id}`}
                 className="text-xs text-fg-muted underline-offset-2 hover:text-primary hover:underline"
               >
                 {s.full_name}

@@ -117,7 +117,7 @@ export function AdminIndividualHub() {
             {students.map((student) => (
               <Link
                 key={student.id}
-                to={`/admin/individual/${student.id}`}
+                to={`/admin/alunos/individual/${student.id}`}
                 className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-border/20"
               >
                 <div className="min-w-0">

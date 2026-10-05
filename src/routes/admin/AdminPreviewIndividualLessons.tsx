@@ -54,7 +54,7 @@ export function AdminPreviewIndividualLessons() {
   return (
     <div className="flex flex-col gap-4">
       <Link
-        to={`/admin/individual/${studentId}`}
+        to={`/admin/alunos/individual/${studentId}`}
         className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Voltar à gestão das aulas
@@ -71,7 +71,7 @@ export function AdminPreviewIndividualLessons() {
         lessons={data.lessons}
         completedIds={data.completedIds}
         emptyLabel="Ainda não há aulas publicadas para este aluno."
-        linkBase={`/admin/individual/${studentId}/aulas`}
+        linkBase={`/admin/alunos/individual/${studentId}/aulas`}
         leadingItem={
           <button
             onClick={() => setCheckInDialogOpen(true)}

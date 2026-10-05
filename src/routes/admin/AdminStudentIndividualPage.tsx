@@ -82,7 +82,7 @@ export function AdminStudentIndividualPage() {
   return (
     <div className="flex flex-col gap-4">
       <Link
-        to="/admin/individual"
+        to="/admin/alunos/individual"
         className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Voltar ao acompanhamento individual
@@ -95,7 +95,7 @@ export function AdminStudentIndividualPage() {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <Button size="sm" variant="outline" asChild>
-            <Link to={`/admin/individual/${studentId}/preview`}>
+            <Link to={`/admin/alunos/individual/${studentId}/preview`}>
               <Eye className="size-4" />
               Ver como aluno
             </Link>

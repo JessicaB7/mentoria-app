@@ -76,22 +76,25 @@ function App() {
                 <Route path="/admin" element={<Navigate to="/admin/gravado" replace />} />
                 <Route path="/admin/ao-vivo" element={<AdminLiveLessons />} />
                 <Route path="/admin/gravado" element={<AdminRecordedContent />} />
-                <Route path="/admin/individual" element={<AdminIndividualHub />} />
-                <Route path="/admin/individual/:studentId" element={<AdminStudentIndividualPage />} />
-                <Route
-                  path="/admin/individual/:studentId/preview"
-                  element={<AdminPreviewIndividualLessons />}
-                />
-                <Route
-                  path="/admin/individual/:studentId/aulas/:lessonId"
-                  element={<AdminPreviewLesson />}
-                />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
                 <Route path="/admin/ferramentas" element={<AdminTools />} />
                 <Route path="/admin/conteudos" element={<AdminContents />} />
-                <Route path="/admin/alunos" element={<AdminStudents />} />
+                <Route path="/admin/alunos" element={<Navigate to="/admin/alunos/dados" replace />} />
+                <Route path="/admin/alunos/dados" element={<AdminStudents />} />
+                <Route path="/admin/alunos/individual" element={<AdminIndividualHub />} />
+                <Route path="/admin/alunos/individual/:studentId" element={<AdminStudentIndividualPage />} />
+                <Route
+                  path="/admin/alunos/individual/:studentId/preview"
+                  element={<AdminPreviewIndividualLessons />}
+                />
+                <Route
+                  path="/admin/alunos/individual/:studentId/aulas/:lessonId"
+                  element={<AdminPreviewLesson />}
+                />
+                <Route path="/admin/alunos/financeiro" element={<AdminFinance />} />
+                <Route path="/admin/individual/*" element={<Navigate to="/admin/alunos/individual" replace />} />
+                <Route path="/admin/financeiro" element={<Navigate to="/admin/alunos/financeiro" replace />} />
                 <Route path="/admin/crm" element={<AdminCrm />} />
-                <Route path="/admin/financeiro" element={<AdminFinance />} />
               </Route>
             </Route>
 

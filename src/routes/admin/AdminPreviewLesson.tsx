@@ -71,7 +71,7 @@ export function AdminPreviewLesson() {
   return (
     <div className="flex flex-col gap-4">
       <Link
-        to={`/admin/individual/${studentId}/preview`}
+        to={`/admin/alunos/individual/${studentId}/preview`}
         className="flex w-fit items-center gap-1 text-sm text-fg-muted hover:text-fg"
       >
         <ArrowLeft className="size-4" /> Voltar às aulas
