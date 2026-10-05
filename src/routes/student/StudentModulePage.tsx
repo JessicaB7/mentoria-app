@@ -68,18 +68,9 @@ export function StudentModulePage() {
         lessons={lessons}
         actions={
           lessons.length > 0 && (
-            <>
-              <div className="flex flex-col gap-1.5">
-                <div className="flex justify-between text-xs">
-                  <span className="text-fg-muted">
-                    {doneCount} de {lessons.length} aulas concluídas
-                  </span>
-                  <span className="font-medium text-fg">{percent}%</span>
-                </div>
-                <Progress value={percent} />
-              </div>
+            <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               {ctaLesson && (
-                <Button asChild className="mt-auto w-full sm:w-fit">
+                <Button asChild className="w-full sm:w-auto">
                   <Link to={`/aluno/aulas/${ctaLesson.id}`}>
                     {allDone ? (
                       <>
@@ -87,13 +78,23 @@ export function StudentModulePage() {
                       </>
                     ) : (
                       <>
-                        {doneCount === 0 ? 'Começar' : 'Continuar'}: {ctaLesson.title} <ArrowRight />
+                        {doneCount === 0 ? 'Começar' : 'Continuar'} <ArrowRight />
                       </>
                     )}
                   </Link>
                 </Button>
               )}
-            </>
+              {doneCount === 0 ? (
+                <p className="text-xs text-fg-muted">Ainda não começaste este módulo.</p>
+              ) : (
+                <div className="flex flex-1 items-center gap-3">
+                  <Progress value={percent} className="flex-1" />
+                  <span className="whitespace-nowrap text-xs text-fg-muted">
+                    {doneCount}/{lessons.length} · {percent}%
+                  </span>
+                </div>
+              )}
+            </div>
           )
         }
       />
