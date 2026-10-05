@@ -2,6 +2,7 @@
 
 @theme {
   --font-sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
 
   --color-background: #faf6ef;
   --color-surface: #ffffff;
@@ -41,4 +42,9 @@
     background: color-mix(in srgb, var(--color-primary) 35%, transparent);
     color: var(--color-fg);
   }
+}
+
+/* Algarismos alinhados na letra de destaque (a Cormorant usa algarismos "antigos" por omissão) */
+.font-display {
+  font-variant-numeric: lining-nums;
 }
