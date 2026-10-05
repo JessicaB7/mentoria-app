@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 
-type PrivateBucket = 'lesson-videos' | 'materials'
+type PrivateBucket = 'lesson-videos' | 'materials' | 'mentor-contents'
 type Bucket = PrivateBucket | 'module-covers'
 
 export async function getSignedUrl(bucket: PrivateBucket, path: string) {

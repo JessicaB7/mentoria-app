@@ -26,6 +26,7 @@ import { AdminStudents } from '@/routes/admin/AdminStudents'
 import { AdminCrm } from '@/routes/admin/AdminCrm'
 import { AdminFinance } from '@/routes/admin/AdminFinance'
 import { AdminTools } from '@/routes/admin/AdminTools'
+import { AdminContents } from '@/routes/admin/AdminContents'
 import { Spinner } from '@/components/ui/spinner'
 
 const queryClient = new QueryClient()
@@ -87,6 +88,7 @@ function App() {
                 />
                 <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
                 <Route path="/admin/ferramentas" element={<AdminTools />} />
+                <Route path="/admin/conteudos" element={<AdminContents />} />
                 <Route path="/admin/alunos" element={<AdminStudents />} />
                 <Route path="/admin/crm" element={<AdminCrm />} />
                 <Route path="/admin/financeiro" element={<AdminFinance />} />

@@ -110,6 +110,19 @@ export type Tool = {
   created_at: string
 }
 
+export type MentorContentKind = 'slides' | 'ferramentas' | 'scripts'
+
+export type MentorContent = {
+  id: string
+  title: string
+  description: string | null
+  kind: MentorContentKind
+  url: string | null
+  file_path: string | null
+  file_type: string | null
+  created_at: string
+}
+
 export type LessonProgress = {
     id: string
     student_id: string
@@ -201,6 +214,7 @@ export type Database = {
                   materials: Table<Material>
                   session_recordings: Table<SessionRecording>
                   tools: Table<Tool>
+                  mentor_contents: Table<MentorContent>
                   lesson_progress: Table<LessonProgress>
                   crm_contacts: Table<CrmContact>
                   crm_tasks: Table<CrmTask>
