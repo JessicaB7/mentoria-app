@@ -73,6 +73,7 @@ export type Lesson = {
     title: string
     description: string | null
     video_path: string | null
+    external_url: string | null
     duration_minutes: number | null
     session_date: string | null
     session_type: SessionType | null

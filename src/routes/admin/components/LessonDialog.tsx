@@ -57,6 +57,7 @@ export function LessonDialog({
   const [recordingDate, setRecordingDate] = React.useState('')
   // Sessões individuais: uma única gravação (link para a pasta da Drive), guardada em session_recordings
   const [recordingLink, setRecordingLink] = React.useState('')
+  const [externalUrl, setExternalUrl] = React.useState('')
 
   React.useEffect(() => {
     if (open) {
@@ -66,6 +67,7 @@ export function LessonDialog({
       setDuration(lesson?.duration_minutes ? String(lesson.duration_minutes) : '')
       setPublished(lesson?.published ?? true)
       setVideoPath(lesson?.video_path ?? null)
+      setExternalUrl(lesson?.external_url ?? '')
       setStudentId(lesson?.student_id ?? defaultStudentId ?? null)
       setSessionDate(lesson?.session_date ?? '')
       setSessionType(lesson?.session_type ?? null)
@@ -126,6 +128,7 @@ export function LessonDialog({
       duration_minutes: duration ? Number(duration) : null,
       published,
       video_path: videoPath,
+      external_url: category === 'modulo' ? externalUrl.trim() || null : null,
       student_id: category === 'individual' ? studentId : null,
       session_date:
         category === 'individual' || category === 'ao_vivo' ? sessionDate || null : null,
@@ -376,6 +379,22 @@ export function LessonDialog({
                   <p className="text-xs text-fg-muted">Link para a pasta da Drive com a gravação da sessão.</p>
                 </div>
               ) : (
+                <>
+                {category === 'modulo' && (
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="lesson-external-url">Link da aula</Label>
+                    <Input
+                      id="lesson-external-url"
+                      type="url"
+                      placeholder="https://…"
+                      value={externalUrl}
+                      onChange={(e) => setExternalUrl(e.target.value)}
+                    />
+                    <p className="text-xs text-fg-muted">
+                      Se preencheres, ao clicar na aula a aluna é levada para este link (abre num separador novo).
+                    </p>
+                  </div>
+                )}
                 <div className="flex flex-col gap-1.5">
                   <Label>Vídeo</Label>
                   <div className="flex items-center gap-2">
@@ -389,6 +408,7 @@ export function LessonDialog({
                     {videoPath && <span className="text-xs text-fg-muted">Vídeo carregado</span>}
                   </div>
                 </div>
+              </>
               )}
               <div className="flex items-center gap-2">
                 <Switch checked={published} onCheckedChange={setPublished} id="lesson-published" />

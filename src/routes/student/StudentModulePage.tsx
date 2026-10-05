@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, Paperclip, PlayCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, ExternalLink, Paperclip, PlayCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { ModuleHeader, ModuleObjective } from '@/components/ModuleHeader'
@@ -85,12 +85,9 @@ export function StudentModulePage() {
           {lessons.map((lesson, index) => {
             const done = completedIds.has(lesson.id)
             const isNext = lesson.id === nextLesson?.id
-            return (
-              <Link
-                key={lesson.id}
-                to={`/aluno/aulas/${lesson.id}`}
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-border/20 ${isNext ? 'bg-primary/5' : ''}`}
-              >
+            const rowClass = `flex items-center gap-3 px-4 py-3 hover:bg-border/20 ${isNext ? 'bg-primary/5' : ''}`
+            const content = (
+              <>
                 <span
                   className={`flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                     done ? 'bg-success/15 text-success' : 'bg-border/40 text-fg-muted'
@@ -116,9 +113,27 @@ export function StudentModulePage() {
                 </div>
                 {done ? (
                   <CheckCircle2 className="size-5 shrink-0 text-success" />
+                ) : lesson.external_url ? (
+                  <ExternalLink className="size-5 shrink-0 text-fg-muted" />
                 ) : (
                   <PlayCircle className="size-5 shrink-0 text-fg-muted" />
                 )}
+              </>
+            )
+            // Aula com link externo: abre o link num separador novo; senão, a página da aula.
+            return lesson.external_url ? (
+              <a
+                key={lesson.id}
+                href={lesson.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={rowClass}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link key={lesson.id} to={`/aluno/aulas/${lesson.id}`} className={rowClass}>
+                {content}
               </Link>
             )
           })}

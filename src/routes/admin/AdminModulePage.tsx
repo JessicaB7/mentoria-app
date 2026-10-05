@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Paperclip, Pencil, Plus, Trash2, Video, VideoOff } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Paperclip, Pencil, Plus, Trash2, Video, VideoOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { ModuleHeader, ModuleObjective } from '@/components/ModuleHeader'
 import { lessonNumber } from '@/lib/modules'
@@ -112,13 +112,22 @@ export function AdminModulePage() {
                     {!lesson.published && <Badge variant="outline">Rascunho</Badge>}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-fg-muted">
-                    {lesson.video_path ? (
+                    {lesson.external_url ? (
+                      <a
+                        href={lesson.external_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 hover:text-fg"
+                      >
+                        <ExternalLink className="size-3" /> Link
+                      </a>
+                    ) : lesson.video_path ? (
                       <span className="flex items-center gap-1">
                         <Video className="size-3" /> Vídeo
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-warning">
-                        <VideoOff className="size-3" /> Sem vídeo
+                        <VideoOff className="size-3" /> Sem vídeo nem link
                       </span>
                     )}
                     {lesson.duration_minutes && <span>{lesson.duration_minutes} min</span>}
