@@ -20,3 +20,12 @@ join (values
   ('Módulo 2 — Presença no Instagram', 'Configurar o teu link da bio', 1),
   ('Módulo 2 — Presença no Instagram', 'Agendamento de serviços', 2)
 ) as x(module_title, title, position) on x.module_title = m.title;
+
+-- Descrições dos módulos alinhadas com as novas aulas.
+update public.modules
+  set description = 'Define o teu nicho e cria a tua proposta de valor.'
+  where title = 'Módulo 1 — Posicionamento e Cliente Ideal';
+
+update public.modules
+  set description = 'Os essenciais no teu perfil, o teu link da bio e o agendamento de serviços.'
+  where title = 'Módulo 2 — Presença no Instagram';
