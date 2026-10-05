@@ -21,5 +21,4 @@
   <circle cx="1040" cy="120" r="250" fill="none" stroke="#d4af37" stroke-opacity="0.2" stroke-width="1"/>
   <rect x="80" y="96" width="64" height="2" fill="url(#gold)"/>
   <text x="80" y="80" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="600" letter-spacing="5" fill="url(#gold)">MÓDULO 00</text>
-  <text font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="700" fill="#f5efe0" y="540"><tspan x="80" dy="0">Onboarding</tspan></text>
 </svg>
