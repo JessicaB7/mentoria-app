@@ -1,5 +1,24 @@
+import * as React from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { GraduationCap, Home, Radio, BookOpen, UserCog, Users, KanbanSquare, LogOut, Euro, Wrench, FolderOpen, IdCard, type LucideIcon } from 'lucide-react'
+import {
+  GraduationCap,
+  Home,
+  Radio,
+  BookOpen,
+  UserCog,
+  Users,
+  KanbanSquare,
+  LogOut,
+  Euro,
+  Wrench,
+  FolderOpen,
+  IdCard,
+  PlayCircle,
+  ChevronDown,
+  Briefcase,
+  MessageSquareText,
+  type LucideIcon,
+} from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
@@ -7,21 +26,55 @@ import { cn } from '@/lib/utils'
 import { isStaff } from '@/types/database'
 import { AdminNotifications } from '@/components/AdminNotifications'
 
-type NavItem = { to: string; label: string; icon: LucideIcon; end: boolean; children?: NavItem[] }
+type NavItem = {
+  to: string
+  label: string
+  icon: LucideIcon
+  end: boolean
+  children?: NavItem[]
+}
 
 const studentNav: NavItem[] = [
   { to: '/aluno/inicio', label: 'Início', icon: Home, end: false },
   { to: '/aluno/ao-vivo', label: 'Aula ao vivo', icon: Radio, end: false },
-  { to: '/aluno/gravado', label: 'Conteúdo gravado', icon: BookOpen, end: false },
-  { to: '/aluno/individual', label: 'Acompanhamento individual', icon: UserCog, end: false },
+  {
+    to: '/aluno/gravado',
+    label: 'Conteúdo gravado',
+    icon: BookOpen,
+    end: false,
+  },
+  {
+    to: '/aluno/individual',
+    label: 'Acompanhamento individual',
+    icon: UserCog,
+    end: false,
+  },
   { to: '/aluno/ferramentas', label: 'Ferramentas', icon: Wrench, end: false },
 ]
 
 const adminNav: NavItem[] = [
   { to: '/admin/ao-vivo', label: 'Aula ao vivo', icon: Radio, end: false },
-  { to: '/admin/gravado', label: 'Conteúdo gravado', icon: BookOpen, end: false },
+  {
+    to: '/admin/gravado',
+    label: 'Conteúdo gravado',
+    icon: BookOpen,
+    end: false,
+    children: [
+      {
+        to: '/admin/gravado/aulas',
+        label: 'Aulas',
+        icon: PlayCircle,
+        end: false,
+      },
+      {
+        to: '/admin/gravado/conteudos',
+        label: 'Conteúdos',
+        icon: FolderOpen,
+        end: false,
+      },
+    ],
+  },
   { to: '/admin/ferramentas', label: 'Ferramentas', icon: Wrench, end: false },
-  { to: '/admin/conteudos', label: 'Conteúdos', icon: FolderOpen, end: false },
   {
     to: '/admin/alunos',
     label: 'Alunos',
@@ -29,11 +82,30 @@ const adminNav: NavItem[] = [
     end: false,
     children: [
       { to: '/admin/alunos/dados', label: 'Dados', icon: IdCard, end: false },
-      { to: '/admin/alunos/individual', label: 'Acompanhamento individual', icon: UserCog, end: false },
-      { to: '/admin/alunos/financeiro', label: 'Financeiro', icon: Euro, end: false },
+      {
+        to: '/admin/alunos/individual',
+        label: 'Acompanhamento individual',
+        icon: UserCog,
+        end: false,
+      },
+      {
+        to: '/admin/alunos/financeiro',
+        label: 'Financeiro',
+        icon: Euro,
+        end: false,
+      },
     ],
   },
-  { to: '/admin/crm', label: 'CRM', icon: KanbanSquare, end: false },
+  {
+    to: '/admin/comercial',
+    label: 'Comercial',
+    icon: Briefcase,
+    end: false,
+    children: [
+      { to: '/admin/comercial/leads', label: 'Leads', icon: KanbanSquare, end: false },
+      { to: '/admin/comercial/scripts', label: 'Scripts', icon: MessageSquareText, end: false },
+    ],
+  },
 ]
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -46,6 +118,23 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  // Grupos fechados pelo mentor; ficam lembrados neste browser.
+  const [collapsed, setCollapsed] = React.useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('nav-collapsed') ?? '[]')
+    } catch {
+      return []
+    }
+  })
+  const toggleGroup = (to: string) => {
+    const next = collapsed.includes(to) ? collapsed.filter((g) => g !== to) : [...collapsed, to]
+    setCollapsed(next)
+    try {
+      localStorage.setItem('nav-collapsed', JSON.stringify(next))
+    } catch {
+      // sem armazenamento: o estado vale só para esta sessão
+    }
+  }
   const nav = variant === 'admin' ? adminNav : studentNav
   const initials = profile?.full_name?.slice(0, 2).toUpperCase() ?? '??'
   const canPreview = isStaff(profile?.role)
@@ -57,16 +146,12 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
         <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
         <div className="flex items-center gap-2.5 border-b border-border px-4 py-4">
           <GraduationCap className="size-6 shrink-0 text-primary" />
-          <span className="text-sm font-semibold leading-tight tracking-wide text-fg">
-            Mentoria Contabilistas
-          </span>
+          <span className="text-sm font-semibold leading-tight tracking-wide text-fg">Mentoria Contabilistas</span>
         </div>
 
         {canPreview && (
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-            <span className="text-xs font-medium text-fg-muted">
-              Vista {variant === 'admin' ? 'Mentor' : 'Aluno'}
-            </span>
+            <span className="text-xs font-medium text-fg-muted">Vista {variant === 'admin' ? 'Mentor' : 'Aluno'}</span>
             <Switch
               checked={variant === 'student'}
               onCheckedChange={(checked) => navigate(checked ? '/aluno' : '/admin')}
@@ -75,34 +160,46 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
         )}
 
         <nav className="flex flex-1 flex-col gap-1 p-3">
-          {nav.map(({ to, label, icon: Icon, end, children }) =>
-            children ? (
+          {nav.map(({ to, label, icon: Icon, end, children }) => {
+            if (!children) {
+              return (
+                <NavLink key={to} to={to} end={end} className={navLinkClass}>
+                  <Icon className="size-4" />
+                  {label}
+                </NavLink>
+              )
+            }
+            const groupActive = pathname.startsWith(`${to}/`)
+            const open = !collapsed.includes(to)
+            return (
               <div key={to} className="flex flex-col gap-1">
-                <div
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(to)}
+                  aria-expanded={open}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 text-sm font-medium text-fg-muted',
-                    pathname.startsWith(to) && 'text-fg',
+                    'flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted transition-colors hover:bg-border/40',
+                    groupActive && 'text-fg',
+                    groupActive && !open && 'bg-primary text-primary-foreground hover:bg-primary',
                   )}
                 >
                   <Icon className="size-4" />
-                  {label}
-                </div>
-                <div className="ml-5 flex flex-col gap-1 border-l border-border pl-2">
-                  {children.map(({ to: childTo, label: childLabel, icon: ChildIcon, end: childEnd }) => (
-                    <NavLink key={childTo} to={childTo} end={childEnd} className={navLinkClass}>
-                      <ChildIcon className="size-4 shrink-0" />
-                      {childLabel}
-                    </NavLink>
-                  ))}
-                </div>
+                  <span className="flex-1">{label}</span>
+                  <ChevronDown className={cn('size-4 shrink-0 transition-transform', !open && '-rotate-90')} />
+                </button>
+                {open && (
+                  <div className="ml-5 flex flex-col gap-1 border-l border-border pl-2">
+                    {children.map(({ to: childTo, label: childLabel, icon: ChildIcon, end: childEnd }) => (
+                      <NavLink key={childTo} to={childTo} end={childEnd} className={navLinkClass}>
+                        <ChildIcon className="size-4 shrink-0" />
+                        {childLabel}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <NavLink key={to} to={to} end={end} className={navLinkClass}>
-                <Icon className="size-4" />
-                {label}
-              </NavLink>
-            ),
-          )}
+            )
+          })}
         </nav>
         <div className="flex items-center gap-2 border-t border-border p-3">
           <Avatar>

@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
-import { CONTENT_KINDS, openContent } from '@/lib/mentorContents'
+import { openContent, type ContentKindOption } from '@/lib/mentorContents'
 import type { MentorContent, MentorContentKind } from '@/types/database'
 
 type Source = 'ficheiro' | 'link'
@@ -20,11 +20,12 @@ interface ContentDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   content: MentorContent | null
+  kinds: ContentKindOption[]
   defaultKind: MentorContentKind
   onSaved: () => void
 }
 
-export function ContentDialog({ open, onOpenChange, content, defaultKind, onSaved }: ContentDialogProps) {
+export function ContentDialog({ open, onOpenChange, content, kinds, defaultKind, onSaved }: ContentDialogProps) {
   const [title, setTitle] = React.useState('')
   const [description, setDescription] = React.useState('')
   const [kind, setKind] = React.useState<MentorContentKind>(defaultKind)
@@ -113,21 +114,23 @@ export function ContentDialog({ open, onOpenChange, content, defaultKind, onSave
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="content-kind">Tipo</Label>
-            <Select value={kind} onValueChange={(v) => setKind(v as MentorContentKind)}>
-              <SelectTrigger id="content-kind">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CONTENT_KINDS.map(({ value, label }) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {kinds.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="content-kind">Tipo</Label>
+              <Select value={kind} onValueChange={(v) => setKind(v as MentorContentKind)}>
+                <SelectTrigger id="content-kind">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {kinds.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="content-description">Notas</Label>
             <Textarea

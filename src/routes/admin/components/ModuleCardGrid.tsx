@@ -20,7 +20,7 @@ export function ModuleCardGrid({
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {modules.map((module) => (
-        <Link key={module.id} to={`/admin/modulos/${module.id}`}>
+        <Link key={module.id} to={`/admin/gravado/aulas/modulos/${module.id}`}>
           <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
             {module.cover_path ? (
               <img

@@ -113,7 +113,7 @@ export type Tool = {
   created_at: string
 }
 
-export type MentorContentKind = 'slides' | 'ferramentas' | 'scripts'
+export type MentorContentKind = 'slides' | 'ferramentas' | 'scripts' | 'comercial'
 
 export type MentorContent = {
   id: string

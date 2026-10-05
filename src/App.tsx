@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
@@ -26,7 +26,7 @@ import { AdminStudents } from '@/routes/admin/AdminStudents'
 import { AdminCrm } from '@/routes/admin/AdminCrm'
 import { AdminFinance } from '@/routes/admin/AdminFinance'
 import { AdminTools } from '@/routes/admin/AdminTools'
-import { AdminContents } from '@/routes/admin/AdminContents'
+import { AdminContents, AdminSalesScripts } from '@/routes/admin/AdminContents'
 import { Spinner } from '@/components/ui/spinner'
 
 const queryClient = new QueryClient()
@@ -44,6 +44,11 @@ function RootRedirect() {
 
   if (!session || !profile) return <Navigate to="/login" replace />
   return <Navigate to={isStaff(profile.role) ? '/admin' : '/aluno'} replace />
+}
+
+function LegacyModuleRedirect() {
+  const { moduleId } = useParams()
+  return <Navigate to={`/admin/gravado/aulas/modulos/${moduleId}`} replace />
 }
 
 function App() {
@@ -73,12 +78,15 @@ function App() {
 
             <Route element={<ProtectedRoute role="staff" />}>
               <Route element={<AppLayout variant="admin" />}>
-                <Route path="/admin" element={<Navigate to="/admin/gravado" replace />} />
+                <Route path="/admin" element={<Navigate to="/admin/gravado/aulas" replace />} />
                 <Route path="/admin/ao-vivo" element={<AdminLiveLessons />} />
-                <Route path="/admin/gravado" element={<AdminRecordedContent />} />
-                <Route path="/admin/modulos/:moduleId" element={<AdminModulePage />} />
+                <Route path="/admin/gravado" element={<Navigate to="/admin/gravado/aulas" replace />} />
+                <Route path="/admin/gravado/aulas" element={<AdminRecordedContent />} />
+                <Route path="/admin/gravado/aulas/modulos/:moduleId" element={<AdminModulePage />} />
+                <Route path="/admin/gravado/conteudos" element={<AdminContents />} />
+                <Route path="/admin/modulos/:moduleId" element={<LegacyModuleRedirect />} />
+                <Route path="/admin/conteudos" element={<Navigate to="/admin/gravado/conteudos" replace />} />
                 <Route path="/admin/ferramentas" element={<AdminTools />} />
-                <Route path="/admin/conteudos" element={<AdminContents />} />
                 <Route path="/admin/alunos" element={<Navigate to="/admin/alunos/dados" replace />} />
                 <Route path="/admin/alunos/dados" element={<AdminStudents />} />
                 <Route path="/admin/alunos/individual" element={<AdminIndividualHub />} />
@@ -94,7 +102,10 @@ function App() {
                 <Route path="/admin/alunos/financeiro" element={<AdminFinance />} />
                 <Route path="/admin/individual/*" element={<Navigate to="/admin/alunos/individual" replace />} />
                 <Route path="/admin/financeiro" element={<Navigate to="/admin/alunos/financeiro" replace />} />
-                <Route path="/admin/crm" element={<AdminCrm />} />
+                <Route path="/admin/comercial" element={<Navigate to="/admin/comercial/leads" replace />} />
+                <Route path="/admin/comercial/leads" element={<AdminCrm />} />
+                <Route path="/admin/comercial/scripts" element={<AdminSalesScripts />} />
+                <Route path="/admin/crm" element={<Navigate to="/admin/comercial/leads" replace />} />
               </Route>
             </Route>
 

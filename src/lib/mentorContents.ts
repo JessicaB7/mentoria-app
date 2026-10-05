@@ -1,12 +1,20 @@
 import { toast } from 'sonner'
-import { Presentation, ScrollText, Wrench } from 'lucide-react'
+import { MessageSquareText, Presentation, ScrollText, Wrench } from 'lucide-react'
 import { getSignedUrl } from '@/lib/storage'
 import type { MentorContent, MentorContentKind } from '@/types/database'
 
-export const CONTENT_KINDS: { value: MentorContentKind; label: string; icon: typeof Presentation }[] = [
+export type ContentKindOption = { value: MentorContentKind; label: string; icon: typeof Presentation }
+
+// Conteúdos de produção das aulas (Conteúdo gravado › Conteúdos)
+export const CONTENT_KINDS: ContentKindOption[] = [
   { value: 'slides', label: 'Slides', icon: Presentation },
   { value: 'ferramentas', label: 'Ferramentas', icon: Wrench },
   { value: 'scripts', label: 'Scripts', icon: ScrollText },
+]
+
+// Scripts de vendas (Comercial › Scripts)
+export const SALES_SCRIPT_KINDS: ContentKindOption[] = [
+  { value: 'comercial', label: 'Scripts comerciais', icon: MessageSquareText },
 ]
 
 export async function openContent(content: MentorContent) {
