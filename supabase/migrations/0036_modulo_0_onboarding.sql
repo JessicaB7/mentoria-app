@@ -31,3 +31,8 @@ from public.modules m,
   ('Diagnóstico inicial: onde estás agora', 1)
 ) as x(title, position)
 where m.title = 'Módulo 0 — Onboarding';
+
+-- 4) Capa, como os outros módulos (ficheiro em supabase/module-covers, carregado no bucket "module-covers").
+update public.modules
+  set cover_path = 'module-0-onboarding.svg'
+  where title = 'Módulo 0 — Onboarding';
