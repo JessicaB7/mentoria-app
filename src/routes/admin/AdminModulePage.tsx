@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Paperclip, Pencil, Plus, Trash2, Video, VideoOff } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { ModuleHeader } from '@/components/ModuleHeader'
+import { ModuleHeader, ModuleObjective } from '@/components/ModuleHeader'
+import { lessonNumber } from '@/lib/modules'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -93,13 +94,17 @@ export function AdminModulePage() {
         }
       />
 
+      <ModuleObjective module={module} />
+
+      <h2 className="px-1 text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
+
       <Card>
         <CardContent className="flex flex-col divide-y divide-border p-0">
           {module.lessons.map((lesson, index) => (
             <div key={lesson.id} className="flex items-center justify-between gap-3 px-4 py-3">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-border/40 text-xs font-semibold text-fg-muted">
-                  {String(index + 1).padStart(2, '0')}
+                  {lessonNumber(module.title, index)}
                 </span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">

@@ -22,6 +22,8 @@ interface ModuleDialogProps {
 export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved }: ModuleDialogProps) {
   const [title, setTitle] = React.useState('')
   const [description, setDescription] = React.useState('')
+  const [objective, setObjective] = React.useState('')
+  const [outcomes, setOutcomes] = React.useState('')
   const [coverPath, setCoverPath] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [uploadingCover, setUploadingCover] = React.useState(false)
@@ -30,6 +32,8 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
     if (open) {
       setTitle(module?.title ?? '')
       setDescription(module?.description ?? '')
+      setObjective(module?.objective ?? '')
+      setOutcomes((module?.outcomes ?? []).join('\n'))
       setCoverPath(module?.cover_path ?? null)
     }
   }, [open, module])
@@ -53,7 +57,16 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
   async function handleSave() {
     if (!title.trim()) return
     setSaving(true)
-    const payload = { title, description, cover_path: coverPath }
+    const payload = {
+      title,
+      description,
+      objective: objective.trim() || null,
+      outcomes: outcomes
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean),
+      cover_path: coverPath,
+    }
     const { error } = module
       ? await supabase.from('modules').update(payload).eq('id', module.id)
       : await supabase.from('modules').insert({ ...payload, position: nextPosition })
@@ -84,6 +97,24 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
               id="module-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="module-objective">Objetivo do módulo</Label>
+            <Textarea
+              id="module-objective"
+              value={objective}
+              onChange={(e) => setObjective(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="module-outcomes">No fim deste módulo vais… (um por linha)</Label>
+            <Textarea
+              id="module-outcomes"
+              value={outcomes}
+              onChange={(e) => setOutcomes(e.target.value)}
+              rows={3}
             />
           </div>
           <div className="flex flex-col gap-1.5">

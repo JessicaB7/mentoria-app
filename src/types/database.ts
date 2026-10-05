@@ -60,6 +60,8 @@ export type Module = {
     position: number
     published: boolean
     cover_path: string | null
+    objective: string | null
+    outcomes: string[]
     created_at: string
 }
 

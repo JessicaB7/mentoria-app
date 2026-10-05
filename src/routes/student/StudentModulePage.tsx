@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, Paperclip, PlayCircle, RotateCcw } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
-import { ModuleHeader } from '@/components/ModuleHeader'
+import { ModuleHeader, ModuleObjective } from '@/components/ModuleHeader'
+import { lessonNumber } from '@/lib/modules'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -99,6 +100,10 @@ export function StudentModulePage() {
         }
       />
 
+      <ModuleObjective module={module} />
+
+      <h2 className="px-1 text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
+
       <Card>
         <CardContent className="flex flex-col divide-y divide-border p-0">
           {lessons.map((lesson, index) => {
@@ -115,7 +120,7 @@ export function StudentModulePage() {
                     done ? 'bg-success/15 text-success' : 'bg-border/40 text-fg-muted'
                   }`}
                 >
-                  {done ? <CheckCircle2 className="size-4" /> : String(index + 1).padStart(2, '0')}
+                  {lessonNumber(module.title, index)}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-fg">{lesson.title}</p>
@@ -133,7 +138,11 @@ export function StudentModulePage() {
                     {isNext && <span className="font-medium text-primary">A seguir</span>}
                   </div>
                 </div>
-                <PlayCircle className="size-5 shrink-0 text-fg-muted" />
+                {done ? (
+                  <CheckCircle2 className="size-5 shrink-0 text-success" />
+                ) : (
+                  <PlayCircle className="size-5 shrink-0 text-fg-muted" />
+                )}
               </Link>
             )
           })}

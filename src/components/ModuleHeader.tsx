@@ -1,13 +1,7 @@
-import { Clock, PlayCircle } from 'lucide-react'
+import { CheckCircle2, Clock, PlayCircle, Target } from 'lucide-react'
+import { splitModuleTitle } from '@/lib/modules'
 import { Card } from '@/components/ui/card'
 import type { Lesson, Module } from '@/types/database'
-
-// "Módulo 1 — Posicionamento e Cliente Ideal" → { number: "01", name: "Posicionamento e Cliente Ideal" }
-function splitModuleTitle(title: string) {
-  const match = title.match(/^Módulo\s+(\d+)\s*[—–-]\s*(.+)$/)
-  if (!match) return { number: null, name: title }
-  return { number: match[1].padStart(2, '0'), name: match[2] }
-}
 
 const goldText = 'bg-gradient-to-b from-[#f1d488] via-[#d4af37] to-[#a9791f] bg-clip-text text-transparent'
 
@@ -81,6 +75,40 @@ export function ModuleHeader({
 
           {actions}
         </div>
+      </div>
+    </Card>
+  )
+}
+
+// Texto inicial com o objetivo do módulo e o que a aluna consegue no fim.
+export function ModuleObjective({ module }: { module: Module }) {
+  const outcomes = module.outcomes ?? []
+  if (!module.objective && outcomes.length === 0) return null
+
+  return (
+    <Card className="p-4 sm:p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+        {module.objective && (
+          <div className="flex flex-1 flex-col gap-2">
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
+              <Target className="size-3.5" /> Objetivo do módulo
+            </p>
+            <p className="text-sm leading-relaxed text-fg">{module.objective}</p>
+          </div>
+        )}
+        {outcomes.length > 0 && (
+          <div className="flex flex-col gap-2 rounded-lg bg-background p-4 sm:w-72 sm:shrink-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-fg-muted">No fim deste módulo vais</p>
+            <ul className="flex flex-col gap-2">
+              {outcomes.map((outcome) => (
+                <li key={outcome} className="flex gap-2 text-sm text-fg">
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                  {outcome}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </Card>
   )
