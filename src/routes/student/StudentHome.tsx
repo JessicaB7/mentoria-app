@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useHomeWelcomeSettings } from '@/components/HomeWelcome'
 import { StudentDashboard } from '@/components/StudentDashboard'
+import { HomeLiveCalendar } from '@/components/LiveCalendarCard'
 
 const QUICK_LINKS = [
   {
@@ -175,6 +176,8 @@ export function StudentHome() {
       </div>
 
       {profile && <StudentDashboard studentId={profile.id} />}
+
+      <HomeLiveCalendar />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (

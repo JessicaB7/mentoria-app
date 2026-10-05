@@ -3,6 +3,7 @@ import { CalendarDays, PlayCircle, Video } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
 import { findLiveSections } from '@/lib/liveSections'
+import { LiveCalendarCard } from '@/components/LiveCalendarCard'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { Lesson, SessionRecording } from '@/types/database'
@@ -62,22 +63,33 @@ export function StudentLiveLessons() {
             {intro?.title ?? 'Hot Seats'}
           </h1>
           {intro?.description && (
-            <p className="max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
               {renderRichText(intro.description)}
             </p>
           )}
         </div>
       </div>
 
-      <Tabs defaultValue="gravacoes">
+      <Tabs defaultValue="calendario">
         <TabsList>
-          <TabsTrigger value="gravacoes">Gravações</TabsTrigger>
           <TabsTrigger value="calendario">Calendário</TabsTrigger>
+          <TabsTrigger value="gravacoes">Gravações</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="calendario">
+          {calendar?.description ? (
+            <LiveCalendarCard lesson={calendar} />
+          ) : (
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-5 py-6 text-sm text-fg-muted">
+              <CalendarDays className="size-5 shrink-0 text-primary" />
+              As próximas datas vão ser anunciadas em breve.
+            </div>
+          )}
+        </TabsContent>
 
         <TabsContent value="gravacoes" className="flex flex-col gap-4">
           {recordingsLesson?.description && (
-            <p className="max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
               {renderRichText(recordingsLesson.description)}
             </p>
           )}
@@ -119,34 +131,6 @@ export function StudentLiveLessons() {
           )}
         </TabsContent>
 
-        <TabsContent value="calendario">
-          {calendar?.description ? (
-            <div className="relative overflow-hidden rounded-2xl border border-primary/40 bg-[#121212] shadow-sm">
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: 'radial-gradient(60% 140% at 100% 0%, rgba(201, 169, 97, 0.22), transparent 70%)',
-                }}
-              />
-              <div className="relative flex items-start gap-4 p-6 sm:p-8">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e4cc8f] to-primary text-[#121212] shadow-md">
-                  <CalendarDays className="size-6" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#c9a961]">{calendar.title}</p>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/85 [&_strong]:text-[#e4cc8f]">
-                    {renderRichText(calendar.description)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-5 py-6 text-sm text-fg-muted">
-              <CalendarDays className="size-5 shrink-0 text-primary" />
-              As próximas datas vão ser anunciadas em breve.
-            </div>
-          )}
-        </TabsContent>
       </Tabs>
     </div>
   )
