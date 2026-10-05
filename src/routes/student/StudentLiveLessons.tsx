@@ -1,36 +1,45 @@
 import { useQuery } from '@tanstack/react-query'
+import { CalendarDays, PlayCircle, Video } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/context/AuthContext'
+import { renderRichText } from '@/lib/richText'
+import { findLiveSections } from '@/lib/liveSections'
 import { Spinner } from '@/components/ui/spinner'
-import { LessonList } from '@/routes/student/components/LessonList'
-import { NextLiveSessionBanner } from '@/components/NextLiveSessionBanner'
-import { LiveRecordingsGallery } from '@/components/LiveRecordingsGallery'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import type { Lesson } from '@/types/database'
+import type { Lesson, SessionRecording } from '@/types/database'
+
+function formatDate(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}
 
 export function StudentLiveLessons() {
-  const { profile } = useAuth()
-
   const { data, isLoading } = useQuery({
-    queryKey: ['student-live-lessons', profile?.id],
+    queryKey: ['student-live-page'],
     queryFn: async () => {
-      const [{ data: lessons, error: lessonsError }, { data: progress, error: progressError }] =
-        await Promise.all([
-          supabase
-            .from('lessons')
-            .select('*')
-            .eq('category', 'ao_vivo')
-            .eq('published', true)
-            .order('position', { ascending: true }),
-          supabase.from('lesson_progress').select('*').eq('student_id', profile!.id),
-        ])
-      if (lessonsError) throw lessonsError
-      if (progressError) throw progressError
+      const { data: lessons, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('category', 'ao_vivo')
+        .eq('published', true)
+        .order('position', { ascending: true })
+      if (error) throw error
+      const sections = findLiveSections((lessons ?? []) as Lesson[])
 
-      const completedIds = new Set((progress ?? []).filter((p) => p.completed).map((p) => p.lesson_id))
-      return { lessons: (lessons ?? []) as Lesson[], completedIds }
+      let recordings: SessionRecording[] = []
+      if (sections.recordings) {
+        const { data: rows, error: recError } = await supabase
+          .from('session_recordings')
+          .select('*')
+          .eq('lesson_id', sections.recordings.id)
+          .order('position', { ascending: true })
+        if (recError) throw recError
+        recordings = (rows ?? []) as SessionRecording[]
+      }
+      return { intro: sections.intro, recordingsLesson: sections.recordings, calendar: sections.calendar, recordings }
     },
-    enabled: !!profile,
   })
 
   if (isLoading || !data) {
@@ -41,27 +50,102 @@ export function StudentLiveLessons() {
     )
   }
 
+  const { intro, recordingsLesson, calendar, recordings } = data
+
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-xl font-semibold text-fg">Aula ao vivo</h1>
-        <p className="text-sm text-fg-muted">Hot Seats e outras sessões em grupo ao vivo.</p>
+      <div className="relative overflow-hidden rounded-2xl border border-primary/25 bg-surface shadow-sm">
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#e4cc8f] via-primary to-[#e4cc8f]" />
+        <div className="flex flex-col gap-3 p-6 sm:p-8">
+          <p className="text-xs font-medium uppercase tracking-[0.25em] text-primary">Aula ao vivo</p>
+          <h1 className="font-display text-3xl font-semibold leading-tight text-fg sm:text-4xl">
+            {intro?.title ?? 'Hot Seats'}
+          </h1>
+          {intro?.description && (
+            <p className="max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
+              {renderRichText(intro.description)}
+            </p>
+          )}
+        </div>
       </div>
-      <Tabs defaultValue="aulas">
-        <TabsList className="max-w-full overflow-x-auto">
-          <TabsTrigger value="aulas">Aulas ao vivo</TabsTrigger>
-          <TabsTrigger value="gravacoes">Gravação das sessões ao vivo</TabsTrigger>
+
+      <Tabs defaultValue="gravacoes">
+        <TabsList>
+          <TabsTrigger value="gravacoes">Gravações</TabsTrigger>
+          <TabsTrigger value="calendario">Calendário</TabsTrigger>
         </TabsList>
-        <TabsContent value="aulas" className="flex flex-col gap-6">
-          <LessonList
-            lessons={data.lessons}
-            completedIds={data.completedIds}
-            emptyLabel="Ainda não há aulas ao vivo publicadas."
-          />
-          <NextLiveSessionBanner lessons={data.lessons} />
+
+        <TabsContent value="gravacoes" className="flex flex-col gap-4">
+          {recordingsLesson?.description && (
+            <p className="max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-fg-muted">
+              {renderRichText(recordingsLesson.description)}
+            </p>
+          )}
+          {recordings.length === 0 ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-5 py-6 text-sm text-fg-muted">
+              <Video className="size-5 shrink-0 text-primary" />
+              Ainda não há gravações. Aparecem aqui depois de cada sessão.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {recordings.map((recording) => (
+                <a
+                  key={recording.id}
+                  href={recording.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+                >
+                  <div className="relative flex aspect-video items-center justify-center bg-[#121212]">
+                    <div
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        background: 'radial-gradient(70% 120% at 100% 0%, rgba(201, 169, 97, 0.25), transparent 70%)',
+                      }}
+                    />
+                    <div className="relative flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-[#e4cc8f] to-primary text-[#121212] shadow-md transition-transform group-hover:scale-110">
+                      <PlayCircle className="size-7" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-0.5 px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-fg">{recording.title}</p>
+                    <p className="text-xs text-fg-muted">
+                      {recording.session_date ? formatDate(recording.session_date) : 'Ver gravação'}
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
         </TabsContent>
-        <TabsContent value="gravacoes">
-          <LiveRecordingsGallery lessons={data.lessons} />
+
+        <TabsContent value="calendario">
+          {calendar?.description ? (
+            <div className="relative overflow-hidden rounded-2xl border border-primary/40 bg-[#121212] shadow-sm">
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background: 'radial-gradient(60% 140% at 100% 0%, rgba(201, 169, 97, 0.22), transparent 70%)',
+                }}
+              />
+              <div className="relative flex items-start gap-4 p-6 sm:p-8">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e4cc8f] to-primary text-[#121212] shadow-md">
+                  <CalendarDays className="size-6" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#c9a961]">{calendar.title}</p>
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/85 [&_strong]:text-[#e4cc8f]">
+                    {renderRichText(calendar.description)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-5 py-6 text-sm text-fg-muted">
+              <CalendarDays className="size-5 shrink-0 text-primary" />
+              As próximas datas vão ser anunciadas em breve.
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

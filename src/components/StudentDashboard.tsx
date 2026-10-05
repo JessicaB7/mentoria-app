@@ -14,47 +14,6 @@ function daysUntil(dateStr: string) {
   return Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-function ProgressRing({ value }: { value: number }) {
-  const radius = 30
-  const circumference = 2 * Math.PI * radius
-  return (
-    <div className="relative size-20 shrink-0">
-      <svg viewBox="0 0 72 72" className="size-full -rotate-90">
-        <defs>
-          <linearGradient id="progress-ring-gold" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#e4cc8f" />
-            <stop offset="100%" stopColor="#8a6a17" />
-          </linearGradient>
-        </defs>
-        <circle
-          cx="36"
-          cy="36"
-          r={radius}
-          fill="none"
-          stroke="var(--color-border)"
-          strokeOpacity="0.5"
-          strokeWidth="6"
-        />
-        <circle
-          cx="36"
-          cy="36"
-          r={radius}
-          fill="none"
-          stroke="url(#progress-ring-gold)"
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={circumference * (1 - value / 100)}
-          className="transition-[stroke-dashoffset] duration-700"
-        />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-display text-xl font-semibold text-fg">
-        {value}%
-      </span>
-    </div>
-  )
-}
-
 export function StudentDashboard({ studentId }: { studentId: string }) {
   const { data } = useQuery({
     queryKey: ['student-dashboard', studentId],
@@ -113,37 +72,15 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
-        {data.total > 0 && (
-          <div className="flex items-center gap-5 rounded-2xl border border-border bg-surface p-5 shadow-sm lg:col-span-2">
-            <ProgressRing value={pct} />
-            <div className="min-w-0">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-fg-muted">Progresso no currículo</p>
-              <p className="mt-1 font-display text-2xl font-semibold text-fg">
-                {data.completed} <span className="text-fg-muted">de {data.total} aulas</span>
-              </p>
-              <p className="mt-0.5 text-xs text-fg-muted">
-                {data.completed === 0
-                  ? 'Dá o primeiro passo hoje.'
-                  : pct < 100
-                    ? 'Continua, estás no bom caminho.'
-                    : 'Currículo concluído!'}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {(data.nextLesson || data.nextLiveSession) && (
-          <div className="relative flex flex-col overflow-hidden rounded-2xl border border-primary/40 bg-[#121212] shadow-sm lg:col-span-3">
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{ background: 'radial-gradient(60% 140% at 100% 0%, rgba(201, 169, 97, 0.25), transparent 70%)' }}
-            />
-            {data.nextLesson && (
-              <Link
-                to={`/aluno/aulas/${data.nextLesson.id}`}
-                className="group relative flex flex-1 items-center gap-4 p-5"
-              >
+      {(data.nextLesson || data.nextLiveSession) && (
+        <div className="relative flex flex-col overflow-hidden rounded-2xl border border-primary/40 bg-[#121212] shadow-sm">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{ background: 'radial-gradient(60% 140% at 100% 0%, rgba(201, 169, 97, 0.25), transparent 70%)' }}
+          />
+          {data.nextLesson && (
+            <Link to={`/aluno/aulas/${data.nextLesson.id}`} className="group relative flex flex-col gap-4 p-5">
+              <div className="flex items-center gap-4">
                 <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e4cc8f] to-primary text-[#121212] shadow-md transition-transform group-hover:scale-105">
                   <Play className="ml-0.5 size-5 fill-current" />
                 </div>
@@ -155,32 +92,45 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
                   {data.completed === 0 ? 'Começar' : 'Continuar'}
                   <ArrowRight className="size-3.5" />
                 </span>
-              </Link>
-            )}
-            {data.nextLiveSession && (
-              <Link
-                to="/aluno/ao-vivo"
-                className={cn(
-                  'relative flex items-center gap-3 px-5 py-3 text-sm text-white/80 hover:text-white',
-                  data.nextLesson && 'border-t border-white/10',
-                )}
-              >
-                <Radio className="size-4 shrink-0 text-[#c9a961]" />
-                <span className="truncate">
-                  <span className="text-white/50">Próxima sessão ao vivo · </span>
-                  {data.nextLiveSession.title} ·{' '}
-                  {(() => {
-                    const d = daysUntil(data.nextLiveSession.session_date!)
-                    if (d === 0) return 'hoje'
-                    if (d === 1) return 'amanhã'
-                    return `em ${d} dias`
-                  })()}
-                </span>
-              </Link>
-            )}
-          </div>
-        )}
-      </div>
+              </div>
+              {data.total > 0 && (
+                <div className="flex items-center gap-4">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-[#e4cc8f] transition-[width] duration-700"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="shrink-0 text-xs text-white/60">
+                    <span className="font-medium text-[#e4cc8f]">{data.completed}</span> de {data.total} aulas · {pct}%
+                  </p>
+                </div>
+              )}
+            </Link>
+          )}
+          {data.nextLiveSession && (
+            <Link
+              to="/aluno/ao-vivo"
+              className={cn(
+                'relative flex items-center gap-3 px-5 py-3 text-sm text-white/80 hover:text-white',
+                data.nextLesson && 'border-t border-white/10',
+              )}
+            >
+              <Radio className="size-4 shrink-0 text-[#c9a961]" />
+              <span className="truncate">
+                <span className="text-white/50">Próxima sessão ao vivo · </span>
+                {data.nextLiveSession.title} ·{' '}
+                {(() => {
+                  const d = daysUntil(data.nextLiveSession.session_date!)
+                  if (d === 0) return 'hoje'
+                  if (d === 1) return 'amanhã'
+                  return `em ${d} dias`
+                })()}
+              </span>
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   )
 }
