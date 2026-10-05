@@ -52,7 +52,7 @@ export function ModuleHeader({
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+        <div className="flex flex-1 flex-col gap-3 px-4 py-4 sm:py-5">
           <div className="hidden sm:block">
             <h1 className="text-xl font-semibold text-fg">{name}</h1>
             <div className="mt-1.5 h-0.5 w-10 rounded-full bg-gradient-to-r from-[#f1d488] via-[#d4af37] to-[#a9791f]" />
@@ -86,30 +86,28 @@ export function ModuleObjective({ module }: { module: Module }) {
   if (!module.objective && outcomes.length === 0) return null
 
   return (
-    <Card className="p-4 sm:p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-        {module.objective && (
-          <div className="flex flex-1 flex-col gap-2">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
-              <Target className="size-3.5" /> Objetivo do módulo
-            </p>
-            <p className="text-sm leading-relaxed text-fg">{module.objective}</p>
-          </div>
-        )}
-        {outcomes.length > 0 && (
-          <div className="flex flex-col gap-2 rounded-lg bg-background p-4 sm:w-72 sm:shrink-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-fg-muted">No fim deste módulo vais</p>
-            <ul className="flex flex-col gap-2">
-              {outcomes.map((outcome) => (
-                <li key={outcome} className="flex gap-2 text-sm text-fg">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
-                  {outcome}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+    <Card className="flex flex-col gap-4 p-4">
+      {module.objective && (
+        <div className="flex flex-col gap-2">
+          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-primary">
+            <Target className="size-3.5" /> Objetivo do módulo
+          </p>
+          <p className="text-sm leading-relaxed text-fg">{module.objective}</p>
+        </div>
+      )}
+      {outcomes.length > 0 && (
+        <div className="flex flex-col gap-2 border-t border-border pt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-fg-muted">No fim deste módulo vais</p>
+          <ul className="flex flex-col gap-2">
+            {outcomes.map((outcome) => (
+              <li key={outcome} className="flex gap-2 text-sm text-fg">
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                {outcome}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Card>
   )
 }

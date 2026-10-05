@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CheckCircle2, Paperclip, PlayCircle, RotateCcw } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Paperclip, PlayCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { ModuleHeader, ModuleObjective } from '@/components/ModuleHeader'
 import { lessonNumber } from '@/lib/modules'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
@@ -55,8 +54,6 @@ export function StudentModulePage() {
   const doneCount = lessons.filter((l) => completedIds.has(l.id)).length
   const percent = lessons.length ? Math.round((doneCount / lessons.length) * 100) : 0
   const nextLesson = lessons.find((l) => !completedIds.has(l.id))
-  const allDone = lessons.length > 0 && !nextLesson
-  const ctaLesson = nextLesson ?? lessons[0]
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
@@ -68,33 +65,12 @@ export function StudentModulePage() {
         module={module}
         lessons={lessons}
         actions={
-          lessons.length > 0 && (
-            <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              {ctaLesson && (
-                <Button asChild className="w-full sm:w-auto">
-                  <Link to={`/aluno/aulas/${ctaLesson.id}`}>
-                    {allDone ? (
-                      <>
-                        <RotateCcw /> Rever módulo
-                      </>
-                    ) : (
-                      <>
-                        {doneCount === 0 ? 'Começar' : 'Continuar'} <ArrowRight />
-                      </>
-                    )}
-                  </Link>
-                </Button>
-              )}
-              {doneCount === 0 ? (
-                <p className="text-xs text-fg-muted">Ainda não começaste este módulo.</p>
-              ) : (
-                <div className="flex flex-1 items-center gap-3">
-                  <Progress value={percent} className="flex-1" />
-                  <span className="whitespace-nowrap text-xs text-fg-muted">
-                    {doneCount}/{lessons.length} · {percent}%
-                  </span>
-                </div>
-              )}
+          doneCount > 0 && (
+            <div className="flex items-center gap-3">
+              <Progress value={percent} className="flex-1" />
+              <span className="whitespace-nowrap text-xs text-fg-muted">
+                {doneCount}/{lessons.length} · {percent}%
+              </span>
             </div>
           )
         }
@@ -102,7 +78,7 @@ export function StudentModulePage() {
 
       <ModuleObjective module={module} />
 
-      <h2 className="px-1 text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
 
       <Card>
         <CardContent className="flex flex-col divide-y divide-border p-0">

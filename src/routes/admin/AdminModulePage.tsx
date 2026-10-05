@@ -96,7 +96,7 @@ export function AdminModulePage() {
 
       <ModuleObjective module={module} />
 
-      <h2 className="px-1 text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-fg-muted">Aulas</h2>
 
       <Card>
         <CardContent className="flex flex-col divide-y divide-border p-0">
