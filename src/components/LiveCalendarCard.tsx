@@ -3,11 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
-import { findLiveSections } from '@/lib/liveSections'
+import { findLiveSections, findNextLiveSession } from '@/lib/liveSections'
 import type { Lesson } from '@/types/database'
 
 // Cartão branco com o texto da aula "Calendário das sessões ao vivo".
-// Na página Início vai buscar a aula sozinho e liga para a página Aula ao vivo.
+// Na página Início mostra só a próxima sessão e liga para a página Aula ao vivo.
 export function LiveCalendarCard({ lesson, showLink = false }: { lesson: Lesson; showLink?: boolean }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-white shadow-sm">
@@ -56,5 +56,35 @@ export function HomeLiveCalendar() {
   })
 
   if (!calendar?.description) return null
-  return <LiveCalendarCard lesson={calendar} showLink />
+  const next = findNextLiveSession(calendar.description)
+  // Sem datas reconhecidas no texto, mostra o calendário completo
+  if (!next) return <LiveCalendarCard lesson={calendar} showLink />
+
+  const days = Math.round((next.date.getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24))
+  const when = days === 0 ? 'Hoje' : days === 1 ? 'Amanhã' : `Daqui a ${days} dias`
+  const dateText = next.date.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' })
+
+  return (
+    <Link
+      to="/aluno/ao-vivo"
+      className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/30 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+    >
+      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#e4cc8f] to-primary text-[#121212] shadow-md">
+        <CalendarDays className="size-6" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#8a6a17]">
+          {next.label ?? 'Próxima sessão ao vivo'} · {when}
+        </p>
+        <p className="mt-1 font-display text-xl font-semibold text-[#121212] first-letter:uppercase">
+          {dateText}
+          {next.time && <span className="font-sans text-base font-normal text-[#2a2a2a]/70"> · {next.time}</span>}
+        </p>
+      </div>
+      <span className="hidden shrink-0 items-center gap-1 rounded-full border border-[#c9a961]/50 px-3 py-1.5 text-xs font-medium text-[#8a6a17] transition-colors group-hover:bg-[#c9a961]/10 sm:inline-flex">
+        Ver calendário
+        <ArrowRight className="size-3.5" />
+      </span>
+    </Link>
+  )
 }
