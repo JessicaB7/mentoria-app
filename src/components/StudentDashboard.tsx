@@ -85,7 +85,7 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
                   <Play className="ml-0.5 size-5 fill-current" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#c9a961]">O teu próximo passo</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-[#c9a961]">A tua próxima aula</p>
                   <p className="mt-1 truncate font-display text-xl font-semibold text-white">{data.nextLesson.title}</p>
                 </div>
                 <span className="hidden shrink-0 items-center gap-1 rounded-full border border-[#c9a961]/40 px-3 py-1.5 text-xs font-medium text-[#e4cc8f] transition-colors group-hover:bg-[#c9a961]/15 sm:inline-flex">
