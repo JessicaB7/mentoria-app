@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
 import type { Module } from '@/types/database'
 
@@ -25,6 +26,7 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
   const [objective, setObjective] = React.useState('')
   const [outcomes, setOutcomes] = React.useState('')
   const [coverPath, setCoverPath] = React.useState<string | null>(null)
+  const [published, setPublished] = React.useState(true)
   const [saving, setSaving] = React.useState(false)
   const [uploadingCover, setUploadingCover] = React.useState(false)
 
@@ -35,6 +37,7 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
       setObjective(module?.objective ?? '')
       setOutcomes((module?.outcomes ?? []).join('\n'))
       setCoverPath(module?.cover_path ?? null)
+      setPublished(module?.published ?? true)
     }
   }, [open, module])
 
@@ -66,6 +69,7 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
         .map((line) => line.trim())
         .filter(Boolean),
       cover_path: coverPath,
+      published,
     }
     const { error } = module
       ? await supabase.from('modules').update(payload).eq('id', module.id)
@@ -133,6 +137,10 @@ export function ModuleDialog({ open, onOpenChange, module, nextPosition, onSaved
                 <input type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
               </label>
             </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch checked={published} onCheckedChange={setPublished} id="module-published" />
+            <Label htmlFor="module-published">Visível para alunos</Label>
           </div>
         </div>
         <DialogFooter>

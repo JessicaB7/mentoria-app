@@ -45,6 +45,16 @@ export function AdminRecordedContent() {
     refresh()
   }
 
+  async function togglePublished(module: Module) {
+    const { error } = await supabase.from('modules').update({ published: !module.published }).eq('id', module.id)
+    if (error) {
+      toast.error('Não foi possível alterar a visibilidade do módulo.')
+      return
+    }
+    toast.success(module.published ? 'Módulo oculto para os alunos.' : 'Módulo visível para os alunos.')
+    refresh()
+  }
+
   function editModule(e: React.MouseEvent, module: Module) {
     e.preventDefault()
     e.stopPropagation()
@@ -79,7 +89,12 @@ export function AdminRecordedContent() {
       </div>
 
       {modules.length > 0 ? (
-        <ModuleCardGrid modules={modules} onEdit={editModule} onDelete={deleteModule} />
+        <ModuleCardGrid
+          modules={modules}
+          onEdit={editModule}
+          onDelete={deleteModule}
+          onTogglePublished={togglePublished}
+        />
       ) : (
         <p className="text-sm text-fg-muted">Ainda não criaste nenhum módulo.</p>
       )}

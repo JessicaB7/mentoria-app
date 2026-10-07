@@ -23,7 +23,12 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
         { data: progress, error: progressError },
         { data: liveSessions, error: liveError },
       ] = await Promise.all([
-        supabase.from('lessons').select('*, modules(position)').eq('category', 'modulo').eq('published', true),
+        supabase
+          .from('lessons')
+          .select('*, modules!inner(position, published)')
+          .eq('category', 'modulo')
+          .eq('published', true)
+          .eq('modules.published', true),
         supabase.from('lesson_progress').select('*').eq('student_id', studentId).eq('completed', true),
         supabase
           .from('lessons')
@@ -52,7 +57,7 @@ export function StudentDashboard({ studentId }: { studentId: string }) {
 
       return {
         total: lessons.length,
-        completed: completedIds.size,
+        completed: lessons.filter((l) => completedIds.has(l.id)).length,
         nextLesson,
         nextLiveSession: ((liveSessions ?? [])[0] as Lesson | undefined) ?? null,
       }
