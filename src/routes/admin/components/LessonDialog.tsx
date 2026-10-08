@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Trash2, Upload, Link as LinkIcon } from 'lucide-react'
+import { Trash2, Upload, Link as LinkIcon, Pencil } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { uploadFile, removeFile } from '@/lib/storage'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
@@ -55,6 +55,7 @@ export function LessonDialog({
   const [recordingTitle, setRecordingTitle] = React.useState('')
   const [recordingUrl, setRecordingUrl] = React.useState('')
   const [recordingDate, setRecordingDate] = React.useState('')
+  const [editingRecordingId, setEditingRecordingId] = React.useState<string | null>(null)
   // Sessões individuais: uma única gravação (link para a pasta da Drive), guardada em session_recordings
   const [recordingLink, setRecordingLink] = React.useState('')
   const [externalUrl, setExternalUrl] = React.useState('')
@@ -71,6 +72,7 @@ export function LessonDialog({
       setStudentId(lesson?.student_id ?? defaultStudentId ?? null)
       setSessionDate(lesson?.session_date ?? '')
       setSessionType(lesson?.session_type ?? null)
+      resetRecordingForm()
     }
   }, [open, lesson, defaultStudentId])
 
@@ -216,28 +218,44 @@ export function LessonDialog({
     refetchMaterials()
   }
 
-  async function handleRecordingAdd() {
-    if (!currentLessonId || !recordingTitle.trim() || !recordingUrl.trim()) return
-    const { error } = await supabase.from('session_recordings').insert({
-      lesson_id: currentLessonId,
-      title: recordingTitle.trim(),
-      url: recordingUrl.trim(),
-      session_date: recordingDate || null,
-      position: recordings?.length ?? 0,
-    })
-    if (error) {
-      toast.error('Não foi possível adicionar a gravação.')
-      return
-    }
+  function resetRecordingForm() {
+    setEditingRecordingId(null)
     setRecordingTitle('')
     setRecordingUrl('')
     setRecordingDate('')
-    toast.success('Gravação adicionada.')
+  }
+
+  function handleRecordingEdit(recording: SessionRecording) {
+    setEditingRecordingId(recording.id)
+    setRecordingTitle(recording.title)
+    setRecordingUrl(recording.url)
+    setRecordingDate(recording.session_date ?? '')
+  }
+
+  async function handleRecordingSave() {
+    if (!currentLessonId || !recordingTitle.trim() || !recordingUrl.trim()) return
+    const fields = {
+      title: recordingTitle.trim(),
+      url: recordingUrl.trim(),
+      session_date: recordingDate || null,
+    }
+    const { error } = editingRecordingId
+      ? await supabase.from('session_recordings').update(fields).eq('id', editingRecordingId)
+      : await supabase
+          .from('session_recordings')
+          .insert({ ...fields, lesson_id: currentLessonId, position: recordings?.length ?? 0 })
+    if (error) {
+      toast.error(editingRecordingId ? 'Não foi possível guardar a gravação.' : 'Não foi possível adicionar a gravação.')
+      return
+    }
+    toast.success(editingRecordingId ? 'Gravação atualizada.' : 'Gravação adicionada.')
+    resetRecordingForm()
     refetchRecordings()
   }
 
   async function handleRecordingDelete(recording: SessionRecording) {
     await supabase.from('session_recordings').delete().eq('id', recording.id)
+    if (recording.id === editingRecordingId) resetRecordingForm()
     refetchRecordings()
   }
 
@@ -488,17 +506,24 @@ export function LessonDialog({
                   />
                   <p className="text-xs text-fg-muted">Aparece na galeria de gravações do aluno.</p>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-fit"
-                  disabled={!recordingTitle.trim() || !recordingUrl.trim()}
-                  onClick={handleRecordingAdd}
-                >
-                  <LinkIcon className="size-4" />
-                  Adicionar gravação
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-fit"
+                    disabled={!recordingTitle.trim() || !recordingUrl.trim()}
+                    onClick={handleRecordingSave}
+                  >
+                    <LinkIcon className="size-4" />
+                    {editingRecordingId ? 'Guardar alterações' : 'Adicionar gravação'}
+                  </Button>
+                  {editingRecordingId && (
+                    <Button type="button" variant="ghost" size="sm" onClick={resetRecordingForm}>
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
                 <div className="flex flex-col divide-y divide-border">
                   {(recordings ?? []).map((recording) => (
                     <div key={recording.id} className="flex items-center justify-between py-2">
@@ -515,12 +540,22 @@ export function LessonDialog({
                           </span>
                         )}
                       </a>
-                      <button
-                        onClick={() => handleRecordingDelete(recording)}
-                        className="text-fg-muted hover:text-danger"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => handleRecordingEdit(recording)}
+                          className="text-fg-muted hover:text-fg"
+                          aria-label="Editar gravação"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => handleRecordingDelete(recording)}
+                          className="text-fg-muted hover:text-danger"
+                          aria-label="Apagar gravação"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                   {(recordings ?? []).length === 0 && (
