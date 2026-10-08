@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { EyeOff, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -39,7 +39,11 @@ export function LessonList({
                   {new Date(lesson.session_date + 'T00:00:00').toLocaleDateString('pt-PT')}
                 </Badge>
               )}
-              {!lesson.published && <Badge variant="outline">Rascunho</Badge>}
+              {!lesson.published && (
+                <Badge variant="outline">
+                  <EyeOff className="mr-1 size-3" /> Oculto para alunos
+                </Badge>
+              )}
               {showStudent && (
                 <Badge variant="outline">
                   {lesson.profiles ? lesson.profiles.full_name : 'Sem aluno · visível a todos'}
@@ -47,7 +51,10 @@ export function LessonList({
               )}
             </div>
             <div className="flex shrink-0 items-center gap-3">
-              <Switch checked={lesson.published} onCheckedChange={() => onTogglePublished(lesson)} />
+              <label className="flex cursor-pointer items-center gap-2 text-xs text-fg-muted">
+                <span className="hidden sm:inline">{lesson.published ? 'Visível para alunos' : 'Não visível'}</span>
+                <Switch checked={lesson.published} onCheckedChange={() => onTogglePublished(lesson)} />
+              </label>
               <Button variant="ghost" size="icon" onClick={() => onEdit(lesson)}>
                 <Pencil className="size-4" />
               </Button>

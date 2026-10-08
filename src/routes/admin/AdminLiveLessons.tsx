@@ -45,7 +45,12 @@ export function AdminLiveLessons() {
   }
 
   async function toggleLessonPublished(lesson: Lesson) {
-    await supabase.from('lessons').update({ published: !lesson.published }).eq('id', lesson.id)
+    const { error } = await supabase.from('lessons').update({ published: !lesson.published }).eq('id', lesson.id)
+    if (error) {
+      toast.error('Não foi possível alterar a visibilidade da aula.')
+      return
+    }
+    toast.success(lesson.published ? 'Aula oculta para os alunos.' : 'Aula visível para os alunos.')
     refresh()
   }
 

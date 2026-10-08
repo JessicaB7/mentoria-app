@@ -430,7 +430,7 @@ export function LessonDialog({
               )}
               <div className="flex items-center gap-2">
                 <Switch checked={published} onCheckedChange={setPublished} id="lesson-published" />
-                <Label htmlFor="lesson-published">Publicada (visível para alunos)</Label>
+                <Label htmlFor="lesson-published">Visível para alunos</Label>
               </div>
             </div>
             <DialogFooter>
