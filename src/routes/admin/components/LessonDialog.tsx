@@ -253,6 +253,19 @@ export function LessonDialog({
     refetchRecordings()
   }
 
+  async function handleRecordingToggleVisible(recording: SessionRecording) {
+    const { error } = await supabase
+      .from('session_recordings')
+      .update({ visible: !recording.visible })
+      .eq('id', recording.id)
+    if (error) {
+      toast.error('Não foi possível alterar a visibilidade da gravação.')
+      return
+    }
+    toast.success(recording.visible ? 'Gravação oculta para os alunos.' : 'Gravação visível para os alunos.')
+    refetchRecordings()
+  }
+
   async function handleRecordingDelete(recording: SessionRecording) {
     await supabase.from('session_recordings').delete().eq('id', recording.id)
     if (recording.id === editingRecordingId) resetRecordingForm()
@@ -526,12 +539,12 @@ export function LessonDialog({
                 </div>
                 <div className="flex flex-col divide-y divide-border">
                   {(recordings ?? []).map((recording) => (
-                    <div key={recording.id} className="flex items-center justify-between py-2">
+                    <div key={recording.id} className="flex items-center justify-between gap-3 py-2">
                       <a
                         href={recording.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-fg hover:underline"
+                        className={`min-w-0 text-sm hover:underline ${recording.visible ? 'text-fg' : 'text-fg-muted'}`}
                       >
                         {recording.title}
                         {recording.session_date && (
@@ -540,7 +553,15 @@ export function LessonDialog({
                           </span>
                         )}
                       </a>
-                      <div className="flex items-center gap-3">
+                      <div className="flex shrink-0 items-center gap-3">
+                        <label className="flex cursor-pointer items-center gap-2 text-xs text-fg-muted">
+                          <span className="hidden sm:inline">{recording.visible ? 'Visível' : 'Não visível'}</span>
+                          <Switch
+                            checked={recording.visible}
+                            onCheckedChange={() => handleRecordingToggleVisible(recording)}
+                            aria-label="Visível para alunos"
+                          />
+                        </label>
                         <button
                           onClick={() => handleRecordingEdit(recording)}
                           className="text-fg-muted hover:text-fg"

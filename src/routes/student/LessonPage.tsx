@@ -50,7 +50,7 @@ export function LessonPage() {
       return {
         lesson: lessonTyped,
         materials: (materials ?? []) as Material[],
-        recordings: (recordings ?? []) as SessionRecording[],
+        recordings: ((recordings ?? []) as SessionRecording[]).filter((r) => r.visible !== false),
         completed: progress?.completed ?? false,
         videoUrl,
       }

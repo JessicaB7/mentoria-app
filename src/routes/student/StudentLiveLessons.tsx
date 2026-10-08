@@ -37,7 +37,8 @@ export function StudentLiveLessons() {
           .eq('lesson_id', sections.recordings.id)
           .order('position', { ascending: true })
         if (recError) throw recError
-        recordings = (rows ?? []) as SessionRecording[]
+        // A política RLS já esconde as ocultas; o filtro cobre a pré-visualização do admin
+        recordings = ((rows ?? []) as SessionRecording[]).filter((r) => r.visible !== false)
       }
       return { intro: sections.intro, recordingsLesson: sections.recordings, calendar: sections.calendar, recordings }
     },

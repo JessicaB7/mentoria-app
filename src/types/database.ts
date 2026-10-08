@@ -97,6 +97,7 @@ export type SessionRecording = {
   title: string
   url: string
   session_date: string | null
+  visible: boolean
   position: number
   created_at: string
 }
