@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/spinner'
+import { IndividualAnalysis } from '@/components/IndividualAnalysis'
+import { checkInFilledCount } from '@/lib/checkIn'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -75,8 +77,14 @@ export function AdminIndividualHub() {
 
   const generalLessons = lessons.filter((l) => !l.student_id)
   const countByStudent = new Map<string, number>()
+  const doneByStudent = new Map<string, number>()
+  const today = new Date().toISOString().slice(0, 10)
   for (const l of lessons) {
-    if (l.student_id) countByStudent.set(l.student_id, (countByStudent.get(l.student_id) ?? 0) + 1)
+    if (!l.student_id) continue
+    countByStudent.set(l.student_id, (countByStudent.get(l.student_id) ?? 0) + 1)
+    if (l.session_date && l.session_date <= today) {
+      doneByStudent.set(l.student_id, (doneByStudent.get(l.student_id) ?? 0) + 1)
+    }
   }
 
   return (
@@ -85,6 +93,8 @@ export function AdminIndividualHub() {
         <h1 className="text-xl font-semibold text-fg">Acompanhamento individual</h1>
         <p className="text-sm text-fg-muted">Sessões 1:1 e conteúdo dedicado a cada aluno.</p>
       </div>
+
+      <IndividualAnalysis students={students} lessons={lessons} />
 
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -125,9 +135,13 @@ export function AdminIndividualHub() {
                   <p className="truncate text-xs text-fg-muted">{student.email}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
+                  {checkInFilledCount(student) === 0 && (
+                    <Badge variant="warning" className="hidden sm:inline-flex">
+                      Check-in por preencher
+                    </Badge>
+                  )}
                   <Badge variant="outline">
-                    {countByStudent.get(student.id) ?? 0}{' '}
-                    {(countByStudent.get(student.id) ?? 0) === 1 ? 'aula' : 'aulas'}
+                    {doneByStudent.get(student.id) ?? 0}/{countByStudent.get(student.id) ?? 0} realizadas
                   </Badge>
                   <ChevronRight className="size-4 text-fg-muted" />
                 </div>
