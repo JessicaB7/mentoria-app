@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { IndividualIntro } from '@/components/IndividualIntro'
 import { IndividualIntroDialog } from '@/components/IndividualIntroDialog'
 import { DiagnosticCard } from '@/components/DiagnosticCard'
+import { IndividualAnalysis } from '@/components/IndividualAnalysis'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
 import type { Lesson, Profile } from '@/types/database'
@@ -53,6 +54,7 @@ export function AdminStudentIndividualPage() {
   function refresh() {
     queryClient.invalidateQueries({ queryKey: ['admin-student-individual-lessons', studentId] })
     queryClient.invalidateQueries({ queryKey: ['admin-individual-lessons'] })
+    queryClient.invalidateQueries({ queryKey: ['individual-analysis', studentId] })
   }
 
   async function deleteLesson(lesson: Lesson) {
@@ -106,6 +108,8 @@ export function AdminStudentIndividualPage() {
           </Button>
         </div>
       </div>
+
+      <IndividualAnalysis student={student} lessons={lessons} />
 
       <IndividualIntro student={student} onEditClick={() => setIntroDialogOpen(true)} />
 
