@@ -89,6 +89,15 @@ function Block({
   )
 }
 
+function SessionGroup({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col border-t border-border pt-1.5 first:border-t-0 first:pt-0">
+      <p className="mb-0.5 px-1 text-xs font-semibold uppercase tracking-wide text-fg-muted">Sessão {n}</p>
+      {children}
+    </div>
+  )
+}
+
 // Visão geral de todos os alunos: check-in, sessões feitas e o que já lhes foi entregue.
 export function IndividualAnalysis({ students, lessons }: { students: Profile[]; lessons: Lesson[] }) {
   const studentLessons = lessons.filter((l) => l.student_id)
@@ -127,8 +136,6 @@ export function IndividualAnalysis({ students, lessons }: { students: Profile[];
 
   const today = new Date().toISOString().slice(0, 10)
   const lessonsOf = (studentId: string) => studentLessons.filter((l) => l.student_id === studentId)
-  const doneOf = (studentId: string) =>
-    lessonsOf(studentId).filter((l) => l.session_date && l.session_date <= today)
 
   // Check-in
   const withFilled = students.map((student) => ({ student, filled: checkInFilledCount(student) }))
@@ -138,65 +145,50 @@ export function IndividualAnalysis({ students, lessons }: { students: Profile[];
     .map(({ student, filled }) => ({ student, detail: `${filled}/${CHECK_IN_FIELDS}` }))
   const checkInMissing = withFilled.filter((s) => s.filled === 0)
 
-  // Sessões
-  const done = studentLessons.filter((l) => l.session_date && l.session_date <= today)
-  const upcoming = studentLessons.filter((l) => l.session_date && l.session_date > today)
-  const undated = studentLessons.filter((l) => !l.session_date)
+  // Número da sessão: "Sessão 2 - …" → 2; sem número no título, usa a ordem da aula para esse aluno.
+  const sessionNumber = new Map<string, number>()
+  for (const student of students) {
+    const mine = [...lessonsOf(student.id)].sort((a, b) => a.position - b.position)
+    mine.forEach((l, i) => {
+      const match = l.title.match(/sess[ãa]o\s*(\d+)/i)
+      sessionNumber.set(l.id, match ? Number(match[1]) : i + 1)
+    })
+  }
+  const numbers = [...new Set([1, 2, 3, ...sessionNumber.values()])].sort((a, b) => a - b)
+  const sessionOf = (studentId: string, n: number) =>
+    lessonsOf(studentId).find((l) => sessionNumber.get(l.id) === n)
+  const isDone = (l: Lesson) => !!l.session_date && l.session_date <= today
 
-  const doneByStudent: Person[] = students.flatMap((student) => {
-    const mine = doneOf(student.id)
-    if (mine.length === 0) return []
-    const last = mine.map((l) => l.session_date!).sort().at(-1)!
-    return [{ student, detail: `${mine.length} · última ${formatDate(last)}` }]
-  })
-  const upcomingByStudent: Person[] = students.flatMap((student) => {
-    const mine = upcoming.filter((l) => l.student_id === student.id)
-    if (mine.length === 0) return []
-    const next = mine.map((l) => l.session_date!).sort()[0]
-    return [{ student, detail: `${mine.length} · próxima ${formatDate(next)}` }]
-  })
-  const undatedByStudent: Person[] = students.flatMap((student) => {
-    const n = undated.filter((l) => l.student_id === student.id).length
-    return n > 0 ? [{ student, detail: String(n) }] : []
-  })
-  const withoutSessions: Person[] = students.filter((s) => doneOf(s.id).length === 0).map((student) => ({ student }))
-
-  // Entregue
+  const done = studentLessons.filter(isDone)
   const recordedDone = data ? done.filter((l) => data.recordedIds.has(l.id)).length : 0
   const missingRecording = data ? done.length - recordedDone : 0
 
-  const missingRecordingByStudent: Person[] = data
-    ? students.flatMap((student) => {
-        const n = doneOf(student.id).filter((l) => !data.recordedIds.has(l.id)).length
-        return n > 0 ? [{ student, detail: `${n} sem gravação` }] : []
-      })
-    : []
-  const recordingsByStudent: Person[] = data
-    ? students.flatMap((student) => {
-        const mine = doneOf(student.id)
-        const n = mine.filter((l) => data.recordedIds.has(l.id)).length
-        return mine.length > 0 ? [{ student, detail: `${n}/${mine.length}` }] : []
-      })
-    : []
-  const materialsByStudent: Person[] = data
-    ? students.flatMap((student) => {
-        const n = lessonsOf(student.id).reduce((sum, l) => sum + (data.materialsByLesson.get(l.id) ?? 0), 0)
-        return n > 0 ? [{ student, detail: String(n) }] : []
-      })
-    : []
-  const materialsCount = data ? [...data.materialsByLesson.values()].reduce((a, b) => a + b, 0) : 0
-  const visibleByStudent: Person[] = students.flatMap((student) => {
-    const mine = lessonsOf(student.id)
-    return mine.length > 0 ? [{ student, detail: `${mine.filter((l) => l.published).length}/${mine.length}` }] : []
+  const bySession = numbers.map((n) => {
+    const rows = students.map((student) => ({ student, lesson: sessionOf(student.id, n) }))
+    const doneRows = rows.filter((r) => r.lesson && isDone(r.lesson))
+    return {
+      n,
+      done: doneRows.map(({ student, lesson }) => ({ student, detail: formatDate(lesson!.session_date!) })),
+      upcoming: rows
+        .filter((r) => r.lesson?.session_date && r.lesson.session_date > today)
+        .map(({ student, lesson }) => ({ student, detail: formatDate(lesson!.session_date!) })),
+      unscheduled: rows
+        .filter((r) => !r.lesson || !r.lesson.session_date)
+        .map(({ student, lesson }) => ({ student, detail: lesson ? 'sem data' : 'por criar' })),
+      recorded: data ? doneRows.filter((r) => data.recordedIds.has(r.lesson!.id)).map(({ student }) => ({ student })) : [],
+      notRecorded: data ? doneRows.filter((r) => !data.recordedIds.has(r.lesson!.id)).map(({ student }) => ({ student })) : [],
+      materials: data
+        ? rows.flatMap(({ student, lesson }) => {
+            const count = lesson ? (data.materialsByLesson.get(lesson.id) ?? 0) : 0
+            return count > 0 ? [{ student, detail: String(count) }] : []
+          })
+        : [],
+      seen: data
+        ? rows.filter((r) => r.lesson && data.completedIds.has(r.lesson.id)).map(({ student }) => ({ student }))
+        : [],
+      doneCount: doneRows.length,
+    }
   })
-  const seenByStudent: Person[] = data
-    ? students.flatMap((student) => {
-        const mine = lessonsOf(student.id)
-        return mine.length > 0
-          ? [{ student, detail: `${mine.filter((l) => data.completedIds.has(l.id)).length}/${mine.length}` }]
-          : []
-      })
-    : []
 
   return (
     <Card>
@@ -230,10 +222,13 @@ export function IndividualAnalysis({ students, lessons }: { students: Profile[];
             </Badge>
           }
         >
-          <Stat label="Realizadas" value={done.length} people={doneByStudent} />
-          <Stat label="Agendadas" value={upcoming.length} people={upcomingByStudent} />
-          {undated.length > 0 && <Stat label="Sem data" value={undated.length} people={undatedByStudent} />}
-          <Stat label="Alunos sem nenhuma sessão" value={withoutSessions.length} people={withoutSessions} warn />
+          {bySession.map((s) => (
+            <SessionGroup key={s.n} n={s.n}>
+              <Stat label="Realizadas" value={s.done.length} people={s.done} />
+              <Stat label="Agendadas" value={s.upcoming.length} people={s.upcoming} />
+              <Stat label="Por agendar" value={s.unscheduled.length} people={s.unscheduled} warn />
+            </SessionGroup>
+          ))}
         </Block>
 
         <Block
@@ -247,25 +242,20 @@ export function IndividualAnalysis({ students, lessons }: { students: Profile[];
             )
           }
         >
-          <Stat
-            label="Gravações partilhadas"
-            value={data ? `${recordedDone}/${done.length}` : '—'}
-            people={recordingsByStudent}
-          />
-          {missingRecording > 0 && (
-            <Stat label="Sem gravação" value={missingRecording} people={missingRecordingByStudent} warn />
-          )}
-          <Stat label="Materiais partilhados" value={data ? materialsCount : '—'} people={materialsByStudent} />
-          <Stat
-            label="Sessões visíveis"
-            value={`${studentLessons.filter((l) => l.published).length}/${studentLessons.length}`}
-            people={visibleByStudent}
-          />
-          <Stat
-            label="Vistas pelos alunos"
-            value={data ? `${data.completedIds.size}/${studentLessons.length}` : '—'}
-            people={seenByStudent}
-          />
+          {bySession.map((s) => (
+            <SessionGroup key={s.n} n={s.n}>
+              <Stat
+                label="Gravação partilhada"
+                value={data ? `${s.recorded.length}/${s.doneCount}` : '—'}
+                people={s.recorded}
+              />
+              {s.notRecorded.length > 0 && (
+                <Stat label="Sem gravação" value={s.notRecorded.length} people={s.notRecorded} warn />
+              )}
+              <Stat label="Com materiais" value={data ? s.materials.length : '—'} people={s.materials} />
+              <Stat label="Vista pelo aluno" value={data ? s.seen.length : '—'} people={s.seen} />
+            </SessionGroup>
+          ))}
         </Block>
       </CardContent>
     </Card>
