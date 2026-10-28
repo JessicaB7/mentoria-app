@@ -71,7 +71,7 @@ function ToolCards({ tools, onSelect }: { tools: Tool[]; onSelect?: (tool: Tool)
   )
 }
 
-// Ferramentas agrupadas por categoria, seguidas dos materiais de aula agrupados por módulo.
+// Materiais de aula agrupados por módulo (no topo), seguidos das ferramentas agrupadas por categoria.
 // No aluno abre o ficheiro/link; no admin abre a edição (onSelect).
 // Materiais de módulos que não estão na lista (ex.: módulo não publicado para o aluno) não aparecem.
 export function ToolsGrid({
@@ -111,15 +111,6 @@ export function ToolsGrid({
 
   return (
     <div className="flex flex-col gap-6">
-      {categories.map((category) => (
-        <section key={category} className="flex flex-col gap-3">
-          {(categories.length > 1 || category !== OTHER_CATEGORY || lessonModules.length > 0) && (
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-muted">{category}</h2>
-          )}
-          <ToolCards tools={groups.get(category)!} onSelect={onSelect} />
-        </section>
-      ))}
-
       {lessonModules.length > 0 && (
         <section className="flex flex-col gap-4">
           <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-fg-muted">
@@ -134,6 +125,15 @@ export function ToolsGrid({
           ))}
         </section>
       )}
+
+      {categories.map((category) => (
+        <section key={category} className="flex flex-col gap-3">
+          {(categories.length > 1 || category !== OTHER_CATEGORY || lessonModules.length > 0) && (
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-muted">{category}</h2>
+          )}
+          <ToolCards tools={groups.get(category)!} onSelect={onSelect} />
+        </section>
+      ))}
     </div>
   )
 }
