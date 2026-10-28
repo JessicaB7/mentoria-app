@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { ToolsGrid } from '@/components/ToolsGrid'
 import { ToolDialog } from '@/routes/admin/components/ToolDialog'
-import type { Tool } from '@/types/database'
+import type { Module, Tool } from '@/types/database'
 
 export function AdminTools() {
   const queryClient = useQueryClient()
@@ -21,6 +21,15 @@ export function AdminTools() {
       const { data, error } = await supabase.from('tools').select('*')
       if (error) throw error
       return data as Tool[]
+    },
+  })
+
+  const { data: modules } = useQuery({
+    queryKey: ['admin-tool-modules'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('modules').select('id, title, position').order('position')
+      if (error) throw error
+      return data as Pick<Module, 'id' | 'title' | 'position'>[]
     },
   })
 
@@ -44,7 +53,7 @@ export function AdminTools() {
           <Spinner className="size-6" />
         </div>
       ) : (
-        <ToolsGrid tools={tools ?? []} onSelect={(tool) => setDialog({ open: true, tool })} />
+        <ToolsGrid tools={tools ?? []} modules={modules ?? []} onSelect={(tool) => setDialog({ open: true, tool })} />
       )}
 
       <ToolDialog
@@ -52,6 +61,7 @@ export function AdminTools() {
         onOpenChange={(open) => setDialog((s) => ({ ...s, open }))}
         tool={dialog.tool}
         categories={categories}
+        modules={modules ?? []}
         onSaved={() => queryClient.invalidateQueries({ queryKey: ['admin-tools'] })}
       />
     </div>

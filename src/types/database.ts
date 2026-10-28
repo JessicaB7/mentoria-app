@@ -110,6 +110,7 @@ export type Tool = {
   url: string | null
   file_path: string | null
   file_type: string | null
+  module_id: string | null
   published: boolean
   created_at: string
 }

@@ -11,23 +11,28 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Spinner } from '@/components/ui/spinner'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { openTool } from '@/components/ToolsGrid'
-import type { Tool } from '@/types/database'
+import type { Module, Tool } from '@/types/database'
 
 type Kind = 'ficheiro' | 'link'
+
+const NO_MODULE = 'nenhum'
 
 interface ToolDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   tool: Tool | null
   categories: string[]
+  modules: Pick<Module, 'id' | 'title'>[]
   onSaved: () => void
 }
 
-export function ToolDialog({ open, onOpenChange, tool, categories, onSaved }: ToolDialogProps) {
+export function ToolDialog({ open, onOpenChange, tool, categories, modules, onSaved }: ToolDialogProps) {
   const [title, setTitle] = React.useState('')
   const [description, setDescription] = React.useState('')
   const [category, setCategory] = React.useState('')
+  const [moduleId, setModuleId] = React.useState(NO_MODULE)
   const [kind, setKind] = React.useState<Kind>('ficheiro')
   const [url, setUrl] = React.useState('')
   const [file, setFile] = React.useState<File | null>(null)
@@ -39,6 +44,7 @@ export function ToolDialog({ open, onOpenChange, tool, categories, onSaved }: To
       setTitle(tool?.title ?? '')
       setDescription(tool?.description ?? '')
       setCategory(tool?.category ?? '')
+      setModuleId(tool?.module_id ?? NO_MODULE)
       setKind(tool?.url ? 'link' : 'ficheiro')
       setUrl(tool?.url ?? '')
       setFile(null)
@@ -63,6 +69,7 @@ export function ToolDialog({ open, onOpenChange, tool, categories, onSaved }: To
         title: title.trim(),
         description: description.trim() || null,
         category: category.trim() || null,
+        module_id: moduleId === NO_MODULE ? null : moduleId,
         published,
         url: kind === 'link' ? url.trim() : null,
         file_path: kind === 'ficheiro' ? filePath : null,
@@ -135,6 +142,25 @@ export function ToolDialog({ open, onOpenChange, tool, categories, onSaved }: To
               ))}
             </datalist>
             <p className="text-xs text-fg-muted">Opcional — agrupa as ferramentas na página do aluno.</p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label>Material de aula</Label>
+            <Select value={moduleId} onValueChange={setModuleId}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NO_MODULE}>Não — ferramenta geral</SelectItem>
+                {modules.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-fg-muted">
+              Ao escolher um módulo, aparece em "Materiais Aulas", agrupado por esse módulo.
+            </p>
           </div>
 
           <div className="flex flex-col gap-1.5">

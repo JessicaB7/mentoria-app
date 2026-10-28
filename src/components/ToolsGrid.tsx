@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
-import { Download, ExternalLink, FileSpreadsheet, FileText, Link as LinkIcon, Pencil, Presentation, Wrench } from 'lucide-react'
+import { Download, ExternalLink, FileSpreadsheet, FileText, GraduationCap, Link as LinkIcon, Pencil, Presentation, Wrench } from 'lucide-react'
 import { getSignedUrl } from '@/lib/storage'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import type { Tool } from '@/types/database'
+import type { Module, Tool } from '@/types/database'
 
 const OTHER_CATEGORY = 'Outros'
 
@@ -32,9 +32,64 @@ export async function openTool(tool: Tool) {
   }
 }
 
-// Ferramentas agrupadas por categoria. No aluno abre o ficheiro/link; no admin abre a edição (onSelect).
-export function ToolsGrid({ tools, onSelect }: { tools: Tool[]; onSelect?: (tool: Tool) => void }) {
-  if (tools.length === 0) {
+type ToolModule = Pick<Module, 'id' | 'title' | 'position'>
+
+function ToolCard({ tool, onSelect }: { tool: Tool; onSelect?: (tool: Tool) => void }) {
+  const Icon = toolIcon(tool)
+  const ActionIcon = onSelect ? Pencil : tool.url ? ExternalLink : Download
+  return (
+    <button
+      type="button"
+      onClick={() => (onSelect ? onSelect(tool) : openTool(tool))}
+      className="group flex items-start gap-3 rounded-lg border border-border bg-surface p-4 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md"
+    >
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <Icon className="size-5" />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-sm font-medium text-fg">{tool.title}</p>
+          {!tool.published && <Badge variant="outline">Rascunho</Badge>}
+        </div>
+        {tool.description && <p className="line-clamp-3 text-xs text-fg-muted">{tool.description}</p>}
+        <span className="mt-1 flex items-center gap-1 text-xs font-medium text-primary">
+          <ActionIcon className="size-3.5" />
+          {onSelect ? 'Editar' : tool.url ? 'Abrir' : 'Descarregar'}
+        </span>
+      </div>
+    </button>
+  )
+}
+
+function ToolCards({ tools, onSelect }: { tools: Tool[]; onSelect?: (tool: Tool) => void }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {[...tools].sort(byTitle).map((tool) => (
+        <ToolCard key={tool.id} tool={tool} onSelect={onSelect} />
+      ))}
+    </div>
+  )
+}
+
+// Ferramentas agrupadas por categoria, seguidas dos materiais de aula agrupados por módulo.
+// No aluno abre o ficheiro/link; no admin abre a edição (onSelect).
+// Materiais de módulos que não estão na lista (ex.: módulo não publicado para o aluno) não aparecem.
+export function ToolsGrid({
+  tools,
+  modules = [],
+  onSelect,
+}: {
+  tools: Tool[]
+  modules?: ToolModule[]
+  onSelect?: (tool: Tool) => void
+}) {
+  const generalTools = tools.filter((t) => !t.module_id)
+  const lessonModules = [...modules]
+    .sort((a, b) => a.position - b.position)
+    .map((module) => ({ module, tools: tools.filter((t) => t.module_id === module.id) }))
+    .filter((g) => g.tools.length > 0)
+
+  if (generalTools.length === 0 && lessonModules.length === 0) {
     return (
       <Card className="flex items-center gap-3 px-4 py-6 text-sm text-fg-muted">
         <Wrench className="size-5 shrink-0" />
@@ -44,7 +99,7 @@ export function ToolsGrid({ tools, onSelect }: { tools: Tool[]; onSelect?: (tool
   }
 
   const groups = new Map<string, Tool[]>()
-  for (const tool of tools) {
+  for (const tool of generalTools) {
     const category = tool.category?.trim() || OTHER_CATEGORY
     groups.set(category, [...(groups.get(category) ?? []), tool])
   }
@@ -58,45 +113,27 @@ export function ToolsGrid({ tools, onSelect }: { tools: Tool[]; onSelect?: (tool
     <div className="flex flex-col gap-6">
       {categories.map((category) => (
         <section key={category} className="flex flex-col gap-3">
-          {(categories.length > 1 || category !== OTHER_CATEGORY) && (
+          {(categories.length > 1 || category !== OTHER_CATEGORY || lessonModules.length > 0) && (
             <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-muted">{category}</h2>
           )}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {groups
-              .get(category)!
-              .sort(byTitle)
-              .map((tool) => {
-                const Icon = toolIcon(tool)
-                const ActionIcon = onSelect ? Pencil : tool.url ? ExternalLink : Download
-                return (
-                  <button
-                    key={tool.id}
-                    type="button"
-                    onClick={() => (onSelect ? onSelect(tool) : openTool(tool))}
-                    className="group flex items-start gap-3 rounded-lg border border-border bg-surface p-4 text-left shadow-sm transition hover:border-primary/50 hover:shadow-md"
-                  >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                      <Icon className="size-5" />
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-medium text-fg">{tool.title}</p>
-                        {!tool.published && <Badge variant="outline">Rascunho</Badge>}
-                      </div>
-                      {tool.description && (
-                        <p className="line-clamp-3 text-xs text-fg-muted">{tool.description}</p>
-                      )}
-                      <span className="mt-1 flex items-center gap-1 text-xs font-medium text-primary">
-                        <ActionIcon className="size-3.5" />
-                        {onSelect ? 'Editar' : tool.url ? 'Abrir' : 'Descarregar'}
-                      </span>
-                    </div>
-                  </button>
-                )
-              })}
-          </div>
+          <ToolCards tools={groups.get(category)!} onSelect={onSelect} />
         </section>
       ))}
+
+      {lessonModules.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-fg-muted">
+            <GraduationCap className="size-4" />
+            Materiais Aulas
+          </h2>
+          {lessonModules.map(({ module, tools }) => (
+            <div key={module.id} className="flex flex-col gap-3 border-l-2 border-primary/30 pl-4">
+              <h3 className="text-sm font-medium text-fg">{module.title}</h3>
+              <ToolCards tools={tools} onSelect={onSelect} />
+            </div>
+          ))}
+        </section>
+      )}
     </div>
   )
 }
