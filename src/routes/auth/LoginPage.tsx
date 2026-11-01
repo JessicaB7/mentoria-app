@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { isStaff } from '@/types/database'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -38,7 +39,7 @@ export function LoginPage() {
   }, [])
 
   if (!loading && session && profile) {
-    return <Navigate to={from ?? (profile.role === 'admin' ? '/admin' : '/aluno')} replace />
+    return <Navigate to={from ?? (isStaff(profile.role) ? '/admin' : '/aluno')} replace />
   }
 
   async function handleSubmit(e: React.FormEvent) {

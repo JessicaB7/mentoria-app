@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { Link } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
@@ -7,10 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { MyHotSeatQuestions } from '@/components/MyHotSeatQuestions'
 
 // Página pública (sem login) para os alunos deixarem dúvidas para o próximo Hot Seat.
 export function HotSeatFormPage() {
   const { profile } = useAuth()
+  const queryClient = useQueryClient()
+  // Campo escondido: as pessoas não o veem, os robôs de spam preenchem-no
+  const [website, setWebsite] = React.useState('')
   const [name, setName] = React.useState('')
   const [priority, setPriority] = React.useState('')
   const [question, setQuestion] = React.useState('')
@@ -30,6 +36,10 @@ export function HotSeatFormPage() {
     e.preventDefault()
     if (!canSubmit) return
     setError(null)
+    if (website) {
+      setSent(true)
+      return
+    }
     setSaving(true)
     const { error } = await supabase.from('hot_seat_questions').insert({
       student_name: name.trim(),
@@ -44,6 +54,7 @@ export function HotSeatFormPage() {
       return
     }
     setSent(true)
+    if (isStudent) queryClient.invalidateQueries({ queryKey: ['my-hot-seat-questions', profile.id] })
   }
 
   function sendAnother() {
@@ -90,6 +101,17 @@ export function HotSeatFormPage() {
           </Card>
         ) : (
           <form onSubmit={submit} className="flex flex-col gap-4">
+            <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+              <label htmlFor="hs-website">Website</label>
+              <input
+                id="hs-website"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </div>
             <Card>
               <CardContent className="flex flex-col gap-2 pt-6">
                 <Label htmlFor="hs-name">
@@ -152,6 +174,24 @@ export function HotSeatFormPage() {
               {saving ? 'A enviar…' : 'Enviar'}
             </Button>
           </form>
+        )}
+
+        {isStudent ? (
+          <Card>
+            <CardContent className="pt-6">
+              <MyHotSeatQuestions studentId={profile.id} />
+            </CardContent>
+          </Card>
+        ) : (
+          !profile && (
+            <p className="text-center text-xs text-fg-muted">
+              Tens conta na app?{' '}
+              <Link to="/login" state={{ from: '/hotseat' }} className="text-primary underline">
+                Entra
+              </Link>{' '}
+              para acompanhares as tuas dúvidas e saberes quando foram respondidas.
+            </p>
+          )
         )}
       </div>
     </div>

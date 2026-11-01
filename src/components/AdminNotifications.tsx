@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import type { Profile } from '@/types/database'
 
@@ -26,10 +27,11 @@ function notify(title: string, body: string) {
   }
 }
 
-// Popups em tempo real para o admin: quando um aluno conclui uma aula ou
-// preenche o Check-in Mentoria. Só funciona enquanto a app está aberta
+// Popups em tempo real para o admin: quando um aluno conclui uma aula,
+// preenche o Check-in Mentoria ou envia uma dúvida para o Hot Seat. Só funciona enquanto a app está aberta
 // (mesmo noutra aba) — não é uma notificação push verdadeira.
 export function AdminNotifications() {
+  const queryClient = useQueryClient()
   React.useEffect(() => {
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission()
@@ -66,12 +68,22 @@ export function AdminNotifications() {
           }
         },
       )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'hot_seat_questions' },
+        (payload) => {
+          const row = payload.new as { student_name: string }
+          notify('Nova dúvida para o Hot Seat 💬', `${row.student_name} enviou uma dúvida`)
+          queryClient.invalidateQueries({ queryKey: ['admin-hot-seat-questions'] })
+          queryClient.invalidateQueries({ queryKey: ['admin-attention-panel'] })
+        },
+      )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [])
+  }, [queryClient])
 
   return null
 }

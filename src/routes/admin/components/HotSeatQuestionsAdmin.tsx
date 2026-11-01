@@ -52,6 +52,7 @@ export function HotSeatQuestionsAdmin() {
 
   function refresh() {
     queryClient.invalidateQueries({ queryKey: ['admin-hot-seat-questions'] })
+    queryClient.invalidateQueries({ queryKey: ['admin-attention-panel'] })
   }
 
   async function toggleAnswered(item: Row) {

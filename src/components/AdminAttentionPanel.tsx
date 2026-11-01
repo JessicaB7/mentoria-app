@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { CircleDollarSign, ClipboardList, MessageSquareWarning } from 'lucide-react'
+import { CircleDollarSign, ClipboardList, MessageCircleQuestion, MessageSquareWarning } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
 import { buildPaymentSchedule, receivedByStudentMap } from '@/lib/paymentSchedule'
@@ -62,19 +62,23 @@ export function AdminAttentionPanel() {
         { data: students, error: studentsError },
         { data: payments, error: paymentsError },
         { data: feedback, error: feedbackError },
+        { count: pendingHotSeat, error: hotSeatError },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('role', 'student'),
         supabase.from('payments').select('*'),
         supabase.from('student_feedback').select('*'),
+        supabase.from('hot_seat_questions').select('id', { count: 'exact', head: true }).eq('answered', false),
       ])
       if (studentsError) throw studentsError
       if (paymentsError) throw paymentsError
       if (feedbackError) throw feedbackError
+      if (hotSeatError) throw hotSeatError
 
       return {
         students: (students ?? []) as Profile[],
         payments: (payments ?? []) as Payment[],
         feedback: (feedback ?? []) as StudentFeedback[],
+        pendingHotSeat: pendingHotSeat ?? 0,
       }
     },
   })
@@ -101,12 +105,12 @@ export function AdminAttentionPanel() {
       return today >= from
     })
 
-    return { missingCheckIn, overduePayments, endingWithoutFeedback }
+    return { missingCheckIn, overduePayments, endingWithoutFeedback, pendingHotSeat: data.pendingHotSeat }
   }, [data])
 
   if (!groups) return null
-  const { missingCheckIn, overduePayments, endingWithoutFeedback } = groups
-  const total = missingCheckIn.length + overduePayments.length + endingWithoutFeedback.length
+  const { missingCheckIn, overduePayments, endingWithoutFeedback, pendingHotSeat } = groups
+  const total = missingCheckIn.length + overduePayments.length + endingWithoutFeedback.length + pendingHotSeat
 
   if (total === 0) return null
 
@@ -116,6 +120,15 @@ export function AdminAttentionPanel() {
         <p className="text-xs font-medium uppercase tracking-wide text-warning">
           Precisa da tua atenção
         </p>
+        {pendingHotSeat > 0 && (
+          <Link to="/admin/ao-vivo" className="group flex items-start gap-2.5">
+            <MessageCircleQuestion className="mt-0.5 size-4 shrink-0 text-warning" />
+            <p className="text-sm font-medium text-fg group-hover:text-primary group-hover:underline">
+              {pendingHotSeat}{' '}
+              {pendingHotSeat === 1 ? 'dúvida do Hot Seat por responder' : 'dúvidas do Hot Seat por responder'}
+            </p>
+          </Link>
+        )}
         <AttentionGroup
           icon={ClipboardList}
           label={missingCheckIn.length === 1 ? 'aluno sem Check-in preenchido' : 'alunos sem Check-in preenchido'}
