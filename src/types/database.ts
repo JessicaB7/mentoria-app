@@ -50,6 +50,7 @@ export type Profile = {
     learning_goals: string | null
     additional_notes: string | null
     onboarding_status: OnboardingStatus
+    content_seen_at: string | null
     created_at: string
 }
 
@@ -62,6 +63,8 @@ export type Module = {
     cover_path: string | null
     objective: string | null
     outcomes: string[]
+    category: ModuleCategory
+    published_at: string | null
     created_at: string
 }
 
@@ -79,6 +82,7 @@ export type Lesson = {
     session_type: SessionType | null
     position: number
     published: boolean
+    published_at: string | null
     created_at: string
 }
 

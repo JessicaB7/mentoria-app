@@ -25,6 +25,7 @@ import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { isStaff } from '@/types/database'
 import { AdminNotifications } from '@/components/AdminNotifications'
+import { StudentNewContentDialog } from '@/components/StudentNewContentDialog'
 
 type NavItem = {
   to: string
@@ -142,6 +143,7 @@ export function AppLayout({ variant }: { variant: 'admin' | 'student' }) {
   return (
     <div className="flex min-h-svh">
       {variant === 'admin' && <AdminNotifications />}
+      {variant === 'student' && <StudentNewContentDialog />}
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
         <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
         <div className="flex items-center gap-2.5 border-b border-border px-4 py-4">
