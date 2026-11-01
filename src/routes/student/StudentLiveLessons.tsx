@@ -137,7 +137,7 @@ export function StudentLiveLessons() {
         </TabsContent>
 
         <TabsContent value="duvidas">
-          {profile && <HotSeatQuestionForm studentId={profile.id} />}
+          {profile && <HotSeatQuestionForm studentId={profile.id} calendarText={calendar?.description ?? null} />}
         </TabsContent>
       </Tabs>
     </div>

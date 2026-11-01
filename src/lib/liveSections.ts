@@ -23,8 +23,8 @@ const MONTHS = ['janeiro', 'fevereiro', 'marco', 'abril', 'maio', 'junho', 'julh
 export type NextLiveSession = { date: Date; label: string | null; time: string | null }
 
 // Lê as datas do texto do calendário ("- Outubro: dia 7 e dia 21", "Evento presencial: 7 de dezembro, no Porto")
-// e devolve a próxima a partir de hoje. O ano não está no texto: uma data muito no passado passa para o ano seguinte.
-export function findNextLiveSession(text: string, now = new Date()): NextLiveSession | null {
+// e devolve as sessões a partir de hoje, por ordem. O ano não está no texto: uma data muito no passado passa para o ano seguinte.
+export function findUpcomingLiveSessions(text: string, now = new Date()): NextLiveSession[] {
   const today = new Date(now)
   today.setHours(0, 0, 0, 0)
   const halfYear = 183 * 24 * 60 * 60 * 1000
@@ -59,9 +59,15 @@ export function findNextLiveSession(text: string, now = new Date()): NextLiveSes
     }
   }
 
-  return (
-    found
-      .filter((s) => s.date.getTime() >= today.getTime())
-      .sort((a, b) => a.date.getTime() - b.date.getTime())[0] ?? null
-  )
+  return found
+    .filter((s) => s.date.getTime() >= today.getTime())
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+}
+
+export function findNextLiveSession(text: string, now = new Date()): NextLiveSession | null {
+  return findUpcomingLiveSessions(text, now)[0] ?? null
+}
+
+export function formatSessionDate(value: string) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long' })
 }

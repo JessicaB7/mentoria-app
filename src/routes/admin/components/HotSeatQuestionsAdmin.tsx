@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
+import { HotSeatAnswers } from '@/components/HotSeatQuestionForm'
+import { formatSessionDate } from '@/lib/liveSections'
 import type { HotSeatQuestion } from '@/types/database'
 
 type Row = HotSeatQuestion & { profiles: { full_name: string; email: string } | null }
@@ -24,6 +26,7 @@ export function HotSeatQuestionsAdmin() {
       const { data, error } = await supabase
         .from('hot_seat_questions')
         .select('*, profiles(full_name, email)')
+        .order('session_date', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: true })
       if (error) throw error
       return data as unknown as Row[]
@@ -107,12 +110,16 @@ export function HotSeatQuestionsAdmin() {
                 onCheckedChange={() => toggleAnswered(item)}
                 aria-label="Marcar como respondida"
               />
-              <div className={cn('flex min-w-0 flex-1 flex-col gap-1', item.answered && 'opacity-60')}>
-                <p className="whitespace-pre-wrap text-sm text-fg">{item.question}</p>
-                {item.context && <p className="whitespace-pre-wrap text-xs text-fg-muted">{item.context}</p>}
-                <p className="text-xs text-fg-muted">
-                  {item.profiles?.full_name || item.profiles?.email || 'Aluno'} · {formatDate(item.created_at)}
-                </p>
+              <div className={cn('flex min-w-0 flex-1 flex-col gap-2', item.answered && 'opacity-60')}>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="text-sm font-semibold text-fg">{item.profiles?.full_name || item.profiles?.email || 'Aluno'}</p>
+                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">{item.topic}</span>
+                  <span className="text-xs text-fg-muted">
+                    {item.session_date ? `Sessão de ${formatSessionDate(item.session_date)}` : 'Próxima sessão'} · enviada a{' '}
+                    {formatDate(item.created_at)}
+                  </span>
+                </div>
+                <HotSeatAnswers item={item} />
               </div>
               <button
                 type="button"

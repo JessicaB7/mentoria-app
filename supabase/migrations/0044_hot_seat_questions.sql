@@ -4,8 +4,11 @@
 create table public.hot_seat_questions (
   id uuid primary key default gen_random_uuid(),
   student_id uuid not null references public.profiles (id) on delete cascade,
-  question text not null check (length(trim(question)) > 0),
-  context text,
+  topic text not null,
+  situation text not null check (length(trim(situation)) > 0),
+  tried text,
+  goal text not null check (length(trim(goal)) > 0),
+  session_date date,
   answered boolean not null default false,
   answered_at timestamptz,
   created_at timestamptz not null default now()
