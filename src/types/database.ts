@@ -211,8 +211,9 @@ export type StudentFeedback = {
 export type HotSeatQuestion = {
     id: string
     student_name: string
+    priority: string
     question: string
-    links: string | null
+    notes: string | null
     student_id: string | null
     answered: boolean
     answered_at: string | null

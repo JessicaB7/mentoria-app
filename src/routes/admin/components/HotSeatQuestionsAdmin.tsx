@@ -142,11 +142,18 @@ export function HotSeatQuestionsAdmin() {
                   <span className="font-semibold">{item.student_name}</span>
                   <span className="text-xs text-fg-muted"> · {formatDate(item.created_at)}</span>
                 </p>
-                <p className="whitespace-pre-wrap text-sm text-fg">{item.question}</p>
-                {item.links && (
+                <div>
+                  <p className="text-xs font-medium text-fg-muted">Prioridade do mês</p>
+                  <p className="whitespace-pre-wrap text-sm text-fg">{item.priority}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-fg-muted">Dúvidas</p>
+                  <p className="whitespace-pre-wrap text-sm text-fg">{item.question}</p>
+                </div>
+                {item.notes && (
                   <div>
-                    <p className="text-xs font-medium text-fg-muted">Links / informações</p>
-                    <p className="whitespace-pre-wrap break-words text-sm text-fg">{linkify(item.links)}</p>
+                    <p className="text-xs font-medium text-fg-muted">Informações importantes</p>
+                    <p className="whitespace-pre-wrap break-words text-sm text-fg">{linkify(item.notes)}</p>
                   </div>
                 )}
               </div>

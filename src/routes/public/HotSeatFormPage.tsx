@@ -12,13 +12,15 @@ import { Textarea } from '@/components/ui/textarea'
 export function HotSeatFormPage() {
   const { profile } = useAuth()
   const [name, setName] = React.useState('')
+  const [priority, setPriority] = React.useState('')
   const [question, setQuestion] = React.useState('')
-  const [links, setLinks] = React.useState('')
+  const [notes, setNotes] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [sent, setSent] = React.useState(false)
 
   const isStudent = profile?.role === 'student'
+  const canSubmit = !!name.trim() && !!priority.trim() && !!question.trim() && !saving
 
   React.useEffect(() => {
     if (isStudent && profile?.full_name) setName((current) => current || profile.full_name)
@@ -26,13 +28,14 @@ export function HotSeatFormPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim() || !question.trim()) return
+    if (!canSubmit) return
     setError(null)
     setSaving(true)
     const { error } = await supabase.from('hot_seat_questions').insert({
       student_name: name.trim(),
+      priority: priority.trim(),
       question: question.trim(),
-      links: links.trim() || null,
+      notes: notes.trim() || null,
       student_id: isStudent ? profile.id : null,
     })
     setSaving(false)
@@ -44,8 +47,9 @@ export function HotSeatFormPage() {
   }
 
   function sendAnother() {
+    setPriority('')
     setQuestion('')
-    setLinks('')
+    setNotes('')
     setSent(false)
   }
 
@@ -66,8 +70,7 @@ export function HotSeatFormPage() {
             </p>
             <CardTitle className="font-display text-2xl">Hot Seat</CardTitle>
             <CardDescription>
-              Deixa todas as dúvidas que queres ver respondidas no próximo Hot Seat e os links que aches necessário
-              partilhar.
+              Conta-nos a tua prioridade deste mês e deixa as dúvidas que queres ver respondidas no próximo Hot Seat.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -105,11 +108,26 @@ export function HotSeatFormPage() {
 
             <Card>
               <CardContent className="flex flex-col gap-2 pt-6">
+                <Label htmlFor="hs-priority">
+                  Qual é a tua principal prioridade este mês? <span className="text-danger">*</span>
+                </Label>
+                <Textarea
+                  id="hs-priority"
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                  rows={3}
+                  required
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="flex flex-col gap-2 pt-6">
                 <Label htmlFor="hs-question">
-                  Qual é a tua maior dúvida? <span className="text-danger">*</span>
+                  Quais são as tuas dúvidas? <span className="text-danger">*</span>
                 </Label>
                 <p className="text-xs text-fg-muted">
-                  Dá um breve contexto e faz uma pergunta direta e específica. Podes fazer mais do que uma pergunta.
+                  Dá um breve contexto e faz perguntas diretas e específicas. Podes fazer mais do que uma pergunta.
                 </p>
                 <Textarea
                   id="hs-question"
@@ -123,16 +141,14 @@ export function HotSeatFormPage() {
 
             <Card>
               <CardContent className="flex flex-col gap-2 pt-6">
-                <Label htmlFor="hs-links">
-                  Links ou informações que consideres importante acrescentar para analisar e/ou ajudar a resolver a tua
-                  dúvida
-                </Label>
-                <Textarea id="hs-links" value={links} onChange={(e) => setLinks(e.target.value)} rows={4} />
+                <Label htmlFor="hs-notes">Informações importantes que tenhamos de ter em conta</Label>
+                <p className="text-xs text-fg-muted">Contexto, números, links ou qualquer detalhe que ajude a responder.</p>
+                <Textarea id="hs-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} />
               </CardContent>
             </Card>
 
             {error && <p className="text-sm text-danger">{error}</p>}
-            <Button type="submit" disabled={!name.trim() || !question.trim() || saving} className="w-fit">
+            <Button type="submit" disabled={!canSubmit} className="w-fit">
               {saving ? 'A enviar…' : 'Enviar'}
             </Button>
           </form>

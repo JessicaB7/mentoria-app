@@ -4,8 +4,9 @@
 create table public.hot_seat_questions (
   id uuid primary key default gen_random_uuid(),
   student_name text not null check (length(trim(student_name)) between 1 and 200),
+  priority text not null check (length(trim(priority)) between 1 and 10000),
   question text not null check (length(trim(question)) between 1 and 10000),
-  links text check (links is null or length(links) <= 10000),
+  notes text check (notes is null or length(notes) <= 10000),
   -- Preenchido quando a aluna envia com sessão iniciada
   student_id uuid references public.profiles (id) on delete set null,
   answered boolean not null default false,
