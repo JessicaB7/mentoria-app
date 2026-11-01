@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
-import { CalendarDays, PlayCircle, Video } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CalendarDays, MessageCircleQuestion, PlayCircle, Video } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
 import { findLiveSections } from '@/lib/liveSections'
 import { LiveCalendarCard } from '@/components/LiveCalendarCard'
-import { HotSeatQuestionForm } from '@/components/HotSeatQuestionForm'
-import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { Lesson, SessionRecording } from '@/types/database'
@@ -20,7 +18,6 @@ function formatDate(value: string) {
 }
 
 export function StudentLiveLessons() {
-  const { profile } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const tab = searchParams.get('tab') ?? 'calendario'
   const { data, isLoading } = useQuery({
@@ -74,6 +71,13 @@ export function StudentLiveLessons() {
               {renderRichText(intro.description)}
             </p>
           )}
+          <Link
+            to="/hotseat"
+            className="inline-flex w-fit items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            <MessageCircleQuestion className="size-4" />
+            Enviar dúvida para o Hot Seat
+          </Link>
         </div>
       </div>
 
@@ -81,7 +85,6 @@ export function StudentLiveLessons() {
         <TabsList>
           <TabsTrigger value="calendario">Calendário</TabsTrigger>
           <TabsTrigger value="gravacoes">Gravações</TabsTrigger>
-          <TabsTrigger value="duvidas">Dúvidas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendario">
@@ -139,9 +142,6 @@ export function StudentLiveLessons() {
           )}
         </TabsContent>
 
-        <TabsContent value="duvidas">
-          {profile && <HotSeatQuestionForm studentId={profile.id} calendarText={calendar?.description ?? null} />}
-        </TabsContent>
       </Tabs>
     </div>
   )

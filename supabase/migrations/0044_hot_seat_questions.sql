@@ -1,34 +1,28 @@
--- Dúvidas que os alunos enviam para serem respondidas nos Hot Seats.
--- O aluno envia e vê as suas; o admin/mentor vê todas e marca-as como respondidas.
+-- Dúvidas para os Hot Seats, enviadas pela página pública /hotseat (não precisa de login).
+-- Qualquer pessoa pode enviar; só o admin/mentor lê, marca como respondida e apaga.
 
 create table public.hot_seat_questions (
   id uuid primary key default gen_random_uuid(),
-  student_id uuid not null references public.profiles (id) on delete cascade,
-  topic text not null,
-  situation text not null check (length(trim(situation)) > 0),
-  tried text,
-  goal text not null check (length(trim(goal)) > 0),
-  session_date date,
+  student_name text not null check (length(trim(student_name)) between 1 and 200),
+  question text not null check (length(trim(question)) between 1 and 10000),
+  links text check (links is null or length(links) <= 10000),
+  -- Preenchido quando a aluna envia com sessão iniciada
+  student_id uuid references public.profiles (id) on delete set null,
   answered boolean not null default false,
   answered_at timestamptz,
   created_at timestamptz not null default now()
 );
 
-create index hot_seat_questions_student_id_idx on public.hot_seat_questions (student_id);
-
 alter table public.hot_seat_questions enable row level security;
 
-create policy "Aluno vê as próprias dúvidas"
-  on public.hot_seat_questions for select
-  using (student_id = auth.uid());
-
-create policy "Aluno envia dúvidas"
+create policy "Qualquer pessoa envia dúvidas"
   on public.hot_seat_questions for insert
-  with check (student_id = auth.uid() and answered = false);
-
-create policy "Aluno apaga dúvidas por responder"
-  on public.hot_seat_questions for delete
-  using (student_id = auth.uid() and answered = false);
+  to anon, authenticated
+  with check (
+    answered = false
+    and answered_at is null
+    and (student_id is null or student_id = auth.uid())
+  );
 
 create policy "Admin gere as dúvidas"
   on public.hot_seat_questions for all

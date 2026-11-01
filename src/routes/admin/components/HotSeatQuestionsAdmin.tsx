@@ -7,11 +7,22 @@ import { supabase } from '@/lib/supabase'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
-import { HotSeatAnswers } from '@/components/HotSeatQuestionForm'
-import { formatSessionDate } from '@/lib/liveSections'
 import type { HotSeatQuestion } from '@/types/database'
 
-type Row = HotSeatQuestion & { profiles: { full_name: string; email: string } | null }
+type Row = HotSeatQuestion
+
+// Torna clicáveis os URLs escritos pelos alunos
+function linkify(text: string) {
+  return text.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+    /^https?:\/\//.test(part) ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-primary underline">
+        {part}
+      </a>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    ),
+  )
+}
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -26,8 +37,7 @@ export function HotSeatQuestionsAdmin() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('hot_seat_questions')
-        .select('*, profiles(full_name, email)')
-        .order('session_date', { ascending: true, nullsFirst: false })
+        .select('*')
         .order('created_at', { ascending: true })
       if (error) throw error
       return data as unknown as Row[]
@@ -62,7 +72,7 @@ export function HotSeatQuestionsAdmin() {
   }
 
   async function copyLink() {
-    const link = `${window.location.origin}/aluno/ao-vivo?tab=duvidas`
+    const link = `${window.location.origin}/hotseat`
     try {
       await navigator.clipboard.writeText(link)
       toast.success('Link copiado! Já podes colar e enviar às alunas.')
@@ -128,15 +138,17 @@ export function HotSeatQuestionsAdmin() {
                 aria-label="Marcar como respondida"
               />
               <div className={cn('flex min-w-0 flex-1 flex-col gap-2', item.answered && 'opacity-60')}>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <p className="text-sm font-semibold text-fg">{item.profiles?.full_name || item.profiles?.email || 'Aluno'}</p>
-                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">{item.topic}</span>
-                  <span className="text-xs text-fg-muted">
-                    {item.session_date ? `Sessão de ${formatSessionDate(item.session_date)}` : 'Próxima sessão'} · enviada a{' '}
-                    {formatDate(item.created_at)}
-                  </span>
-                </div>
-                <HotSeatAnswers item={item} />
+                <p className="text-sm text-fg">
+                  <span className="font-semibold">{item.student_name}</span>
+                  <span className="text-xs text-fg-muted"> · {formatDate(item.created_at)}</span>
+                </p>
+                <p className="whitespace-pre-wrap text-sm text-fg">{item.question}</p>
+                {item.links && (
+                  <div>
+                    <p className="text-xs font-medium text-fg-muted">Links / informações</p>
+                    <p className="whitespace-pre-wrap break-words text-sm text-fg">{linkify(item.links)}</p>
+                  </div>
+                )}
               </div>
               <button
                 type="button"

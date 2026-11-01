@@ -7,6 +7,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { AppLayout } from '@/components/AppLayout'
 import { LoginPage } from '@/routes/auth/LoginPage'
 import { ResetPasswordPage } from '@/routes/auth/ResetPasswordPage'
+import { HotSeatFormPage } from '@/routes/public/HotSeatFormPage'
 import { StudentHome } from '@/routes/student/StudentHome'
 import { StudentLiveLessons } from '@/routes/student/StudentLiveLessons'
 import { StudentRecordedContent } from '@/routes/student/StudentRecordedContent'
@@ -61,6 +62,7 @@ function App() {
             <Route path="/" element={<RootRedirect />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/hotseat" element={<HotSeatFormPage />} />
 
             <Route element={<ProtectedRoute role="student" />}>
               <Route element={<AppLayout variant="student" />}>

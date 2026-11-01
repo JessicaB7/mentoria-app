@@ -210,12 +210,10 @@ export type StudentFeedback = {
 
 export type HotSeatQuestion = {
     id: string
-    student_id: string
-    topic: string
-    situation: string
-    tried: string | null
-    goal: string
-    session_date: string | null
+    student_name: string
+    question: string
+    links: string | null
+    student_id: string | null
     answered: boolean
     answered_at: string | null
     created_at: string
