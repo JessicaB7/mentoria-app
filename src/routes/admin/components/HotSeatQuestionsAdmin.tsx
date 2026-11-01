@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Trash2 } from 'lucide-react'
+import { Link2, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Spinner } from '@/components/ui/spinner'
@@ -60,6 +61,16 @@ export function HotSeatQuestionsAdmin() {
     refresh()
   }
 
+  async function copyLink() {
+    const link = `${window.location.origin}/aluno/ao-vivo?tab=duvidas`
+    try {
+      await navigator.clipboard.writeText(link)
+      toast.success('Link copiado! Já podes colar e enviar às alunas.')
+    } catch {
+      toast.message(link)
+    }
+  }
+
   const rows = data ?? []
   const pendingCount = rows.filter((r) => !r.answered).length
   const visible = rows.filter((r) => (filter === 'all' ? true : filter === 'answered' ? r.answered : !r.answered))
@@ -73,6 +84,11 @@ export function HotSeatQuestionsAdmin() {
             {pendingCount === 1 ? '1 dúvida por responder' : `${pendingCount} dúvidas por responder`}
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" size="sm" onClick={copyLink}>
+          <Link2 className="size-4" />
+          Copiar link do formulário
+        </Button>
         <div className="inline-flex gap-1 rounded-lg border border-border bg-surface p-1">
           {(
             [
@@ -93,6 +109,7 @@ export function HotSeatQuestionsAdmin() {
               {label}
             </button>
           ))}
+        </div>
         </div>
       </div>
 

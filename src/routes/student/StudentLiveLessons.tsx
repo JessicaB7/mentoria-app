@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { CalendarDays, PlayCircle, Video } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
@@ -20,6 +21,8 @@ function formatDate(value: string) {
 
 export function StudentLiveLessons() {
   const { profile } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab = searchParams.get('tab') ?? 'calendario'
   const { data, isLoading } = useQuery({
     queryKey: ['student-live-page'],
     queryFn: async () => {
@@ -74,7 +77,7 @@ export function StudentLiveLessons() {
         </div>
       </div>
 
-      <Tabs defaultValue="calendario">
+      <Tabs value={tab} onValueChange={(value) => setSearchParams({ tab: value }, { replace: true })}>
         <TabsList>
           <TabsTrigger value="calendario">Calendário</TabsTrigger>
           <TabsTrigger value="gravacoes">Gravações</TabsTrigger>

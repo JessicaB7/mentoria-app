@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 export function LoginPage() {
   const { session, profile, loading, signIn } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as { from?: string } | null)?.from ?? null
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
@@ -36,7 +38,7 @@ export function LoginPage() {
   }, [])
 
   if (!loading && session && profile) {
-    return <Navigate to={profile.role === 'admin' ? '/admin' : '/aluno'} replace />
+    return <Navigate to={from ?? (profile.role === 'admin' ? '/admin' : '/aluno')} replace />
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -49,7 +51,7 @@ export function LoginPage() {
       setError('Email ou palavra-passe inválidos.')
       return
     }
-    navigate('/', { replace: true })
+    navigate(from ?? '/', { replace: true })
   }
 
   async function handleForgotPassword() {
