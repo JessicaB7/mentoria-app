@@ -208,6 +208,16 @@ export type StudentFeedback = {
     created_at: string
 }
 
+export type HotSeatQuestion = {
+    id: string
+    student_id: string
+    question: string
+    context: string | null
+    answered: boolean
+    answered_at: string | null
+    created_at: string
+}
+
 type Table<Row> = { Row: Row; Insert: Partial<Row>; Update: Partial<Row>; Relationships: [] }
 
 export type Database = {
@@ -228,6 +238,7 @@ export type Database = {
                   student_goals: Table<StudentGoal>
                   student_deliverables: Table<StudentDeliverable>
                   student_feedback: Table<StudentFeedback>
+                  hot_seat_questions: Table<HotSeatQuestion>
           }
           Views: Record<string, never>
           Functions: Record<string, never>

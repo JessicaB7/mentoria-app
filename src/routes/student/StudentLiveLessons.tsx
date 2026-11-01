@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase'
 import { renderRichText } from '@/lib/richText'
 import { findLiveSections } from '@/lib/liveSections'
 import { LiveCalendarCard } from '@/components/LiveCalendarCard'
+import { HotSeatQuestionForm } from '@/components/HotSeatQuestionForm'
+import { useAuth } from '@/context/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { Lesson, SessionRecording } from '@/types/database'
@@ -17,6 +19,7 @@ function formatDate(value: string) {
 }
 
 export function StudentLiveLessons() {
+  const { profile } = useAuth()
   const { data, isLoading } = useQuery({
     queryKey: ['student-live-page'],
     queryFn: async () => {
@@ -75,6 +78,7 @@ export function StudentLiveLessons() {
         <TabsList>
           <TabsTrigger value="calendario">Calendário</TabsTrigger>
           <TabsTrigger value="gravacoes">Gravações</TabsTrigger>
+          <TabsTrigger value="duvidas">Dúvidas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendario">
@@ -132,6 +136,9 @@ export function StudentLiveLessons() {
           )}
         </TabsContent>
 
+        <TabsContent value="duvidas">
+          {profile && <HotSeatQuestionForm studentId={profile.id} />}
+        </TabsContent>
       </Tabs>
     </div>
   )

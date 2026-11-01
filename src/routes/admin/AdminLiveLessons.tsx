@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { LessonDialog } from '@/routes/admin/components/LessonDialog'
 import { LessonList, type LessonWithStudent } from '@/routes/admin/components/LessonList'
+import { HotSeatQuestionsAdmin } from '@/routes/admin/components/HotSeatQuestionsAdmin'
 import type { Lesson } from '@/types/database'
 
 export function AdminLiveLessons() {
@@ -87,6 +88,8 @@ export function AdminLiveLessons() {
         onDelete={deleteLesson}
         onTogglePublished={toggleLessonPublished}
       />
+
+      <HotSeatQuestionsAdmin />
 
       <LessonDialog
         open={lessonDialog.open}
