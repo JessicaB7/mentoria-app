@@ -41,7 +41,6 @@ export function StudentNewContentDialog() {
           .from('modules')
           .select('id, title')
           .eq('published', true)
-          .eq('category', 'modulo')
           .gt('published_at', seenAt!)
           .order('position', { ascending: true }),
         supabase

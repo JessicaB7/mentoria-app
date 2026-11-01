@@ -63,7 +63,6 @@ export type Module = {
     cover_path: string | null
     objective: string | null
     outcomes: string[]
-    category: ModuleCategory
     published_at: string | null
     created_at: string
 }
