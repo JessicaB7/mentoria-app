@@ -25,7 +25,13 @@ function linkify(text: string) {
 }
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' })
+  return new Date(value).toLocaleString('pt-PT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 export function HotSeatQuestionsAdmin() {
@@ -140,7 +146,7 @@ export function HotSeatQuestionsAdmin() {
               <div className={cn('flex min-w-0 flex-1 flex-col gap-2', item.answered && 'opacity-60')}>
                 <p className="text-sm text-fg">
                   <span className="font-semibold">{item.student_name}</span>
-                  <span className="text-xs text-fg-muted"> · {formatDate(item.created_at)}</span>
+                  <span className="text-xs text-fg-muted"> · respondido a {formatDate(item.created_at)}</span>
                 </p>
                 <div>
                   <p className="text-xs font-medium text-fg-muted">Prioridade do mês</p>

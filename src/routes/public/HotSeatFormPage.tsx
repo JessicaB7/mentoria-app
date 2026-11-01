@@ -127,7 +127,7 @@ export function HotSeatFormPage() {
                   Quais são as tuas dúvidas? <span className="text-danger">*</span>
                 </Label>
                 <p className="text-xs text-fg-muted">
-                  Dá um breve contexto e faz perguntas diretas e específicas. Podes fazer mais do que uma pergunta.
+                  Dá um breve contexto e faz perguntas diretas e específicas.
                 </p>
                 <Textarea
                   id="hs-question"
